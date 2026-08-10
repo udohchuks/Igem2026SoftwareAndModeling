@@ -1,0 +1,35 @@
+# Unit-conversion constants used only inside src/interfaces.py.
+#
+# These do not appear in any of the three source documents. They are needed
+# because the documents are written in different unit systems, and a joint
+# cannot be made without them. They are listed here, with sources, rather
+# than hidden as literals in the adapter code.
+
+meta:
+  purpose: "Constants required by the two joints. Not from the source documents."
+
+N_A:
+  value: 6.02214076e+23
+  unit: mol^-1
+  meaning: Avogadro constant
+  status: exact
+  source: "SI definition"
+
+cells_per_g_dry_weight:
+  value: 3.57e+12
+  unit: cells/g
+  meaning: E. coli cells per gram dry weight
+  status: sourced
+  source: "BioNumbers: E. coli single-cell dry mass approx 0.28 pg; 1/0.28e-12 = 3.57e12"
+  note: >
+    Sensitive to growth rate. Cell dry mass ranges roughly 0.2-0.5 pg across
+    growth conditions, so this constant alone carries a factor of about 2.5.
+    Part III uses X in g/L, Part II uses molecules/cell; this is the only
+    bridge between them.
+
+minutes_per_hour:
+  value: 60
+  unit: min/h
+  meaning: Part I and Part II run in minutes; Part III runs in hours.
+  status: exact
+  source: null

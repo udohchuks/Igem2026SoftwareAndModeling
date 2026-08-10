@@ -1,0 +1,170 @@
+# Part I — Bioleaching. Source: "Bioleaching Models.docx".
+# Values transcribed verbatim from the parameter tables. Nothing corrected.
+# status: sourced | calibrate | operating_choice | unmeasured | geometry
+# Unit system: umol/L, minutes, mol, m, m^2.
+
+meta:
+  part: I
+  source: docs/source/Bioleaching Models.docx
+  concentration_unit: umol/L
+  time_unit: min
+
+enzyme_production:
+  k_syn:
+    value: null
+    unit: umol.cell^-1.min^-1
+    meaning: Enzyme synthesis rate per cell
+    status: calibrate
+    source: null
+  k_deg:
+    value: 1.1e-3
+    unit: min^-1
+    meaning: Enzyme degradation rate
+    status: sourced
+    source: "[4] Maurizi 1992"
+  mu:
+    value: 0.0
+    unit: min^-1
+    meaning: Growth-dilution rate (= ln2/t_double); 0 if no growth
+    status: sourced
+    source: "[3] Alon 2019"
+  X:
+    value: null
+    unit: cell/L
+    meaning: Biomass concentration
+    status: input_measured
+    source: null
+
+tetrathionate:
+  F_in:
+    value: null
+    unit: umol.L^-1.min^-1
+    meaning: Tetrathionate feed rate
+    status: operating_choice
+    source: null
+  k_cat:
+    value: null
+    unit: min^-1
+    meaning: Turnover number of TetH
+    status: calibrate
+    note: "unmeasured --- calibrate"
+    source: "[1] Kanao 2024"
+  K_m:
+    value: null
+    range: [50, 2400]
+    unit: umol/L
+    meaning: Michaelis constant
+    status: sourced_range
+    source: "[2] Kanao 2007"
+  k1:
+    value: null
+    unit: L.umol^-1.min^-1
+    meaning: Parasitic Cu(II)-thiosulfate rate constant
+    status: calibrate
+    note: "increases without NH3"
+    source: "[6][7]"
+
+thiosulfate:
+  Y:
+    value: 1
+    unit: dimensionless
+    meaning: Stoichiometric yield (S2O3 per S4O6)
+    status: sourced
+    source: "[1]"
+  V:
+    value: null
+    unit: L
+    meaning: Reactor volume
+    status: operating_choice
+    source: null
+
+gold_leaching:
+  rho_Au:
+    value: 19300
+    unit: kg.m^-3
+    meaning: Gold density
+    status: sourced
+    source: null
+  t_film:
+    value: null
+    range: [0.05e-6, 1.0e-6]
+    unit: m
+    meaning: Gold plating thickness
+    status: board_spec
+    source: null
+  k_Au_O2:
+    value: 11
+    unit: umol.m^-2.min^-1
+    meaning: Gold rate constant, O2 route
+    status: sourced
+    note: "approx 11 (1.9e-7 mol m^-2 s^-1)"
+    source: "[9][10]"
+  k_Au_Cu:
+    value: null
+    unit: umol.m^-2.min^-1
+    meaning: Gold rate constant, Cu(II) route
+    status: sourced_relative
+    note: "approx 10^3 x larger than k_Au_O2"
+    source: "[11][12]"
+  K_O2:
+    value: 50
+    unit: umol/L
+    meaning: O2 half-saturation
+    status: calibrate
+    note: "calibrate (~50)"
+    source: null
+  K_S:
+    value: 5.0e+4
+    unit: umol/L
+    meaning: Thiosulfate half-saturation
+    status: calibrate
+    note: "calibrate (~5e4)"
+    source: null
+  K_Cu:
+    value: null
+    unit: umol/L
+    meaning: Cu(II) half-saturation
+    status: calibrate
+    source: null
+
+copper:
+  rho_Cu:
+    value: 8960
+    unit: kg.m^-3
+    meaning: Copper density
+    status: sourced
+    source: null
+  d:
+    value: null
+    range: [2.0e-3, 6.0e-3]
+    unit: m
+    meaning: Crushed particle size
+    status: operating_choice
+    note: "your feed"
+    source: null
+  k_Cu_O2:
+    value: null
+    unit: umol.m^-2.min^-1
+    meaning: Copper rate constant, O2 route
+    status: calibrate
+    note: "Ea approx 25.8 kJ/mol"
+    source: "[13]"
+  k_Cu_Cu:
+    value: null
+    unit: umol.m^-2.min^-1
+    meaning: Copper rate constant, Cu(II) route
+    status: calibrate
+    source: null
+  k3:
+    value: null
+    unit: L.umol^-1.min^-1
+    meaning: Parasitic (Cu(II)+S2O3) rate constant
+    status: calibrate
+    note: "approx equal to k1"
+    source: "[6][7]"
+  k4:
+    value: null
+    unit: L.umol^-1.min^-1
+    meaning: Cu(I) re-oxidation rate constant
+    status: calibrate
+    source: null

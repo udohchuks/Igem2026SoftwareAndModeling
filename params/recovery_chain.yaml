@@ -1,0 +1,130 @@
+# Part III — Gold biorecovery chain. Source: model.md v3.0 section 7.
+# Values and status text transcribed verbatim. Nothing corrected.
+# Unit system: uM, hours, g/L.
+
+meta:
+  part: III
+  source: docs/source/model.md
+  version: "v3.0 (2026-08-04)"
+  concentration_unit: uM
+  time_unit: h
+
+V1_capture:
+  mu:
+    value: 0.70
+    status: standard E. coli
+  Xmax:
+    value: 5.0
+    unit: g/L
+    status: standard E. coli
+  X0:
+    value: 0.05
+    unit: g/L
+    status: standard E. coli
+  m:
+    value: 0.005
+    status: standard E. coli
+  q_max:
+    value: 4.4
+    unit: uM/(g/L)
+    sweep: [0.33, 4.4]
+    status: "may be 5-13x optimistic vs published display ceiling"
+    flag: warning
+    joint: "JOINT 2 — supplied by params/expression.yaml via interfaces.qmax_from_expression"
+  K_D:
+    value: 0.1
+    unit: uM
+    sweep: [1.0e-4, 0.1]
+    status: "insensitive (PRCC approx 0); bounded by CXXC proxies"
+    conflict: "Part II lists K_d = 10 uM placeholder. See ISSUES.md item 1."
+  k_on:
+    value: 1.0
+    status: "unsourced; only K_D matters"
+  A_tox:
+    value: 250
+    unit: uM
+    pessimistic: 30
+    status: "LB regime; two sources agree on ~30 uM onset"
+  k_dam:
+    value: 1.0
+    status: "unsourced; k_dam/A_tox non-identifiable --- only the ratio is determined"
+  k_rep0:
+    value: 0.1
+    status: "unsourced; k_dam/A_tox non-identifiable --- only the ratio is determined"
+  w:
+    value: 1.0
+    status: "insensitive (PRCC -0.02)"
+  Au_feed:
+    value: null
+    range: [10, 20]
+    unit: uM
+    status: "input from out-of-scope leaching model"
+    joint: "JOINT 1 — supplied by params/leach.yaml via interfaces.au_feed_from_leach"
+
+elution:
+  phi:
+    value: 0.13
+    sweep: [0.05, 0.30]
+    status: "87% desorption, protein biosorbent + 1 M thiourea. May be formulation-dependent (95-98% with additives)"
+  k_max:
+    value: 2.0
+    unit: h^-1
+    status: "at 1 M thiourea; design lever via [TU]"
+
+reduction:
+  k_red:
+    value: null
+    range: [0.0072, 158]
+    unit: uM^-1.h^-1
+    scale: log
+    status: "literature thiol-Au bracket; insensitive given F-W"
+  k1:
+    value: 5.0e-5
+    unit: h^-1
+    status: "weakly calibrated --- joint #1 driver"
+    flag: warning
+  k2:
+    value: 0.2
+    unit: uM^-1.h^-1
+    status: "weakly calibrated --- joint #1 driver"
+    flag: warning
+  k_ox:
+    value: 0.02
+    unit: h^-1
+    status: "unsourced; measurable (air vs N2)"
+  k_rech:
+    value: 0.1
+    status: insensitive
+  K_i:
+    value: 500
+    status: insensitive
+  R0:
+    value: null
+    range: [10, 1000]
+    unit: uM
+    status: "lysis-dilution choice, not a literature value"
+  nu:
+    value: 0.5
+    status: "stoichiometric; 0.5 for Au(I), 1.5 for Au(III)"
+  E_tot:
+    formula: "protein/70000 * 1e6"
+    status: "measurable; set by induction"
+
+recovery:
+  eta_spin:
+    value: null
+    range: [0.45, 0.99]
+    status: "sourced only at 10 nm (~0.50)"
+  eta_wash:
+    value: 0.95
+    status: "unsourced --- upper bound"
+    flag: warning
+  eta_ash:
+    value: 0.98
+    status: "conditional on 500-600 C"
+
+# Reported results from model.md, for regression testing.
+reported:
+  eta_total_median: 0.105
+  eta_total_ci90: [0.0, 0.494]
+  critical_path_h: 42

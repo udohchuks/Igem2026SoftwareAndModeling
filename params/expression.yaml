@@ -1,0 +1,94 @@
+# Part II — GolB surface site density. Source: "GolB_model_writeup.docx" section 4.
+# Values transcribed verbatim. Nothing corrected.
+# Unit system: molecules/cell, minutes.
+
+meta:
+  part: II
+  source: docs/source/GolB_model_writeup.docx
+  amount_unit: molecules/cell
+  time_unit: min
+
+alpha:
+  value: 0.5
+  unit: mRNA.min^-1.copy^-1
+  meaning: Transcription rate per plasmid copy (promoter strength)
+  status: sourced
+  source: "Typical E. coli promoter output (BioNumbers)"
+
+N:
+  value: 20
+  unit: copies/cell
+  meaning: Plasmid copy number
+  status: sourced
+  source: "Medium-copy backbone, pBR322-like (approx 15-20)"
+
+delta_m:
+  value: 0.20
+  unit: min^-1
+  meaning: mRNA degradation rate
+  status: sourced
+  source: "E. coli mRNA half-life approx 2-5 min (t_half approx 3.5 min)"
+
+beta:
+  value: 4.0
+  unit: protein.min^-1.mRNA^-1
+  meaning: Translation rate per mRNA (RBS strength)
+  status: sourced
+  source: "Typical E. coli translation efficiency (BioNumbers)"
+
+k_sec:
+  value: 0.10
+  unit: min^-1
+  meaning: Export / surface-display rate constant
+  status: fitted
+  source: "Set by the display scaffold; fitted parameter"
+
+delta_c:
+  value: 0.005
+  unit: min^-1
+  meaning: Cytoplasmic protein degradation
+  status: assumed
+  source: "approx 0 for a stable protein"
+
+delta_s:
+  value: 0.005
+  unit: min^-1
+  meaning: Surface protein loss
+  status: assumed
+  source: "Assumed dilution-dominated"
+
+mu:
+  value: 0.02
+  unit: min^-1
+  meaning: Growth (dilution) rate
+  status: sourced
+  source: "Doubling time approx 35 min (mu = ln2 / t_double)"
+
+f:
+  value: 0.5
+  unit: dimensionless
+  meaning: Fraction folded + gold-accessible
+  status: fitted
+  source: "Folding/accessibility; fitted parameter"
+
+P_s_max:
+  value: 1.0e+5
+  unit: sites/cell
+  meaning: Maximum surface anchor sites
+  status: sourced
+  source: "Autodisplay reaches >10^5 molecules/cell (Jose & Meyer)"
+
+K_d:
+  value: 10
+  unit: uM
+  meaning: GolB-Au(I) dissociation constant
+  status: placeholder
+  source: "Placeholder -- no clean experimental K_d; source or fit"
+  conflict: "Part III params table lists K_D = 0.1 uM (conservative), sweep 1e-4-0.1. See ISSUES.md item 1."
+
+# Reported steady state from Part II section 5, for regression testing.
+reported_steady_state:
+  m: 45
+  P_c: 1460
+  P_s: 5500
+  A: 2900
