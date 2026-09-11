@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An evolving model of biological gold recovery from electronic waste.">
+  <title>Recovering Gold from E-waste</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar" aria-label="Page contents">
+    <a class="workspace" href="#top" aria-label="Return to the page title">
+      <span class="workspace-mark" aria-hidden="true">Au</span>
+      <span>
+        <strong>Gold recovery</strong>
+        <small>Modelling wiki</small>
+      </span>
+    </a>
+
+    <nav>
+      <p class="nav-label">On this page</p>
+      <a class="nav-link active" href="#overview">
+        <span aria-hidden="true">01</span>
+        Process overview
+      </a>
+      <a class="nav-link" href="#making-leachant">
+        <span aria-hidden="true">02</span>
+        Making the leachant
+      </a>
+      <a class="nav-link" href="#dissolving-gold">
+        <span aria-hidden="true">03</span>
+        Dissolving the gold
+      </a>
+      <a class="nav-link" href="#leach-to-capture">
+        <span aria-hidden="true">04</span>
+        Leach-to-capture handover
+      </a>
+    </nav>
+
+    <p class="sidebar-note">The page is being assembled one approved section at a time.</p>
+  </aside>
+
+  <main id="top">
+    <header class="page-header">
+      <p class="eyebrow">Modelling</p>
+      <h1>Recovering Gold from E-waste</h1>
+      <p class="opening-question">Can engineered <i>E. coli</i> effectively recover gold from electronic waste?</p>
+    </header>
+
+    <section class="overview" id="overview" aria-labelledby="overview-title">
+      <div class="section-heading">
+        <span class="section-number">01</span>
+        <div>
+          <p class="section-kicker">From electronic waste to metallic gold</p>
+          <h2 id="overview-title">Process overview</h2>
+        </div>
+      </div>
+
+      <div class="process-shell">
+        <img class="process-overview" src="../docs/media/wiki/concepts/overview-process-draft-embedded.svg" alt="Five-stage gold recovery process: make thiosulfate, leach crushed PCB, capture dissolved gold, release it with thiourea, and return it to metallic gold.">
+      </div>
+    </section>
+
+    <section class="introduction" aria-labelledby="introduction-title">
+      <h2 id="introduction-title">Introduction</h2>
+
+      <div class="introduction-copy">
+        <p>Electronic waste contains valuable metals that are difficult to recover selectively and sustainably. Our project proposes an engineered <i>E. coli</i>-supported process that produces a thiosulfate leachant, dissolves gold from printed circuit boards, captures the dissolved gold using surface-displayed GolB, releases it with thiourea, and reduces it back to metallic gold.</p>
+
+        <p>Modelling is essential for connecting this biological process to both the wet-lab experiments and the hardware used to operate it. It helps translate biological behaviour into operating conditions, equipment requirements and measurable design decisions. Throughout the project, the models have guided choices affecting both the wet lab and hardware while identifying the limitations that must be resolved before scale-up.</p>
+
+        <p>The models follow gold through the various stages, then assess what would be required to scale the complete recovery process to an industrial level.</p>
+      </div>
+    </section>
+
+    <section class="model-section" id="making-leachant" aria-labelledby="making-leachant-title">
+      <div class="section-heading">
+        <span class="section-number">02</span>
+        <div>
+          <p class="section-kicker">Stage one</p>
+          <h2 id="making-leachant-title">Making the leachant</h2>
+        </div>
+      </div>
+
+      <p class="stage-question">How can engineered <i>E. coli</i> supply TetH to prepare a thiosulfate leachant?</p>
+
+      <div class="opening-answer">
+        <span class="evidence prediction">Model conclusion</span>
+        <p>Within the current model, engineered <i>E. coli</i> can supply TetH for leachant preparation. The principal design trade-off is how much culture to grow versus how long the conversion is allowed to run.</p>
+      </div>
+
+      <div class="stage-summary" aria-label="Model summary">
+        <article>
+          <span>Biological input</span>
+          <strong>Engineered cells producing TetH</strong>
+        </article>
+        <article>
+          <span>Engineering decision</span>
+          <strong>Culture volume versus conversion time</strong>
+        </article>
+        <article>
+          <span>Process output</span>
+          <strong>Modelled thiosulfate conversion liquor</strong>
+        </article>
+      </div>
+
+      <div class="body-copy stage-intro">
+        <p>Gold must first be dissolved before it can be captured. Our process uses thiosulfate for this job, so the first modelling stage asks how the engineered cells can supply TetH and how that enzyme can prepare the leachant.</p>
+      </div>
+
+      <section class="design-history" aria-labelledby="design-history-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Model-informed design</p>
+          <h3 id="design-history-title">Why the process became sequential</h3>
+        </div>
+        <div class="history-copy">
+          <p>Our first model placed the cells, enzyme, sulfur chemistry and crushed PCB in one vessel. It showed that copper released from the board would consume the thiosulfate as it formed, while one vessel would force <i>E. coli</i>, TetH and the gold-leaching chemistry to share incompatible pH conditions.</p>
+          <p>We therefore separated the process. The cells produce TetH first; the enzyme is harvested, refolded and purified; then it converts tetrathionate without PCB-derived copper present. Only afterwards is the conversion liquor conditioned and transferred to PCB leaching. Separation does not remove copper from the later leach, but it lets thiosulfate accumulate before copper can attack it and allows each operation to be controlled independently.</p>
+        </div>
+      </section>
+
+      <section class="model-core" aria-labelledby="model-core-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Model structure</p>
+          <h3 id="model-core-title">From TetH production to thiosulfate conversion</h3>
+        </div>
+
+        <div class="body-copy flush-copy">
+          <p>The protein-expression model estimates the TetH supplied by the culture. A recovery step makes active TetH available to a separate conversion vessel, where the enzyme concentration becomes an input to the tetrathionate model.</p>
+        </div>
+
+        <div class="model-part">
+          <div class="model-part-heading">
+            <span>Model 1 · TetH supply</span>
+            <h4>Culture volume supplies the selected enzyme charge</h4>
+          </div>
+          <p class="model-part-copy">The expression model converts active TetH per cell into active TetH per litre of culture. The amount of culture required then follows from the enzyme concentration selected for the conversion vessel.</p>
+          <div class="equation-card">
+            <span class="equation-label">Protein-to-process connection</span>
+            <div class="math-stack compact-math" aria-label="TetH concentration and culture volume equations">
+              <div class="math-display">\[[\mathrm{TetH}]_{\mathrm{culture}}=\frac{sC_{\mathrm{cells}}}{N_A}\times 10^6\]</div>
+              <div class="math-display">\[\frac{V_{\mathrm{culture}}}{V_{\mathrm{conversion}}}=\frac{E_2}{[\mathrm{TetH}]_{\mathrm{culture}}}\]</div>
+            </div>
+            <p>Here, \(s\) is active TetH per cell, \(C_{\mathrm{cells}}\) is culture cell density, and \(E_2\) is the active TetH concentration selected for conversion.</p>
+          </div>
+
+          <div class="result-reading model-part-result">
+            <span class="evidence prediction">Model prediction</span>
+            <p>Reaching the same conversion endpoint sooner requires a larger enzyme charge and therefore more culture per litre of conversion vessel.</p>
+          </div>
+          <figure class="model-figure large-figure">
+            <img src="../docs/media/wiki/plots/making-teth-culture-requirement.svg" alt="Modelled culture volume required per litre of conversion vessel decreases as the allowed conversion time increases.">
+            <figcaption>
+              <strong>Longer conversion batches require less culture</strong>
+              <span>The curve holds the selected conversion endpoint constant while changing the time allowed. The marked point shows the current batch-time scenario.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="model-part model-part-conversion">
+          <div class="model-part-heading">
+            <span>Model 2 · Tetrathionate conversion</span>
+            <h4>TetH converts the broth substrate into thiosulfate</h4>
+          </div>
+
+        <div class="equation-card reaction-card">
+          <span class="equation-label">TetH-catalysed reaction</span>
+          <div class="math-display" aria-label="Tetrathionate plus water produces thiosulfate, elemental sulfur, sulfate and two protons">
+            \[
+              \mathrm{S_4O_6^{2-}+H_2O \xrightarrow{TetH} S_2O_3^{2-}+S^0+SO_4^{2-}+2H^+}
+            \]
+          </div>
+        </div>
+
+        <div class="equation-card">
+          <span class="equation-label">Governing conversion rate</span>
+          <p class="equation-intro">The rate depends on the active TetH supplied and on how close tetrathionate is to saturating the enzyme.</p>
+          <div class="math-display" aria-label="Michaelis-Menten rate for TetH conversion of tetrathionate">
+            \[
+              v=\frac{k_{\mathrm{cat}}E_2[S_4O_6^{2-}]}{K_{S_4O_6}+[S_4O_6^{2-}]}
+            \]
+          </div>
+          <p>Here, \(v\) is the conversion rate, \(E_2\) is active TetH in the conversion vessel, \(k_{\mathrm{cat}}\) is its turnover rate, and \(K_{S_4O_6}\) is the tetrathionate concentration giving half the maximum rate.</p>
+        </div>
+        </div>
+      </section>
+
+      <section class="result-section" aria-labelledby="leachant-result-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">What the model shows</p>
+          <h3 id="leachant-result-title">Thiosulfate accumulates as tetrathionate is converted</h3>
+        </div>
+
+        <div class="result-reading lead-reading">
+          <span class="evidence prediction">Model prediction</span>
+          <p>Once active TetH is supplied under the selected operating conditions, the model predicts that tetrathionate falls while thiosulfate rises. Because the starting tetrathionate concentration is high relative to the half-saturation constant, TetH initially works close to its maximum rate and conversion is nearly linear for most of the batch.</p>
+        </div>
+
+        <figure class="model-figure large-figure">
+          <img src="../docs/media/wiki/plots/making-thiosulfate-conversion.svg" alt="Current model trajectory over three days: tetrathionate decreases while thiosulfate increases.">
+          <figcaption>
+            <strong>Tetrathionate falls while thiosulfate accumulates</strong>
+            <span>The trajectory uses the selected enzyme-loading scenario. The broth already contains thiosulfate, and TetH increases that pool by converting tetrathionate.</span>
+          </figcaption>
+        </figure>
+
+        <div class="finding-strip" aria-label="Conclusions from the conversion model">
+          <article><strong>More active TetH</strong><span>shortens the conversion batch.</span></article>
+          <article><strong>More conversion time</strong><span>can compensate for a lower enzyme loading.</span></article>
+          <article><strong>Separate operation</strong><span>lets the culture and conversion conditions be controlled independently.</span></article>
+        </div>
+      </section>
+
+      <div class="technical-stack" aria-label="Expandable model details">
+        <details>
+          <summary>
+            <span><small>Complete protein model</small>How the cells supply TetH</span>
+            <span class="details-action">View equations</span>
+          </summary>
+          <div class="details-content">
+            <p>The expression cascade follows messenger RNA, intracellular protein, processed protein and the fraction represented as active TetH. It applies the project’s current <i>E. coli</i> expression framework to the TetH construct, so its expression and processing terms are model proxies rather than TetH-specific fits.</p>
+            <div class="math-stack" aria-label="TetH expression equations">
+              <div class="math-display">\[\frac{dm}{dt}=\alpha N-(\delta_m+\mu)m\]</div>
+              <div class="math-display">\[\frac{dP_c}{dt}=\beta m-(k_{\mathrm{sec}}+\delta_c+\mu)P_c\]</div>
+              <div class="math-display">\[\frac{dP_s}{dt}=k_{\mathrm{sec}}P_c\left(1-\frac{P_s}{P_{s,\max}}\right)-(\delta_s+\mu)P_s\]</div>
+              <div class="math-display">\[s=fP_s\]</div>
+            </div>
+            <p>Here, \(m\) is messenger RNA, \(P_c\) is intracellular protein, \(P_s\) is processed protein, and \(s\) is the active TetH count assigned per cell. The default simulation begins with all three dynamic pools at zero.</p>
+            <p>The active protein count is converted to a concentration using the culture cell density, \(C_{\mathrm{cells}}\), then linked to catalytic capacity:</p>
+            <div class="math-stack">
+              <div class="math-display">\[[\mathrm{TetH}]=\frac{sC_{\mathrm{cells}}}{N_A}\times 10^6\]</div>
+              <div class="math-display">\[V_{\max}=k_{\mathrm{cat}}[\mathrm{TetH}]\]</div>
+              <div class="math-display">\[\frac{V_{\mathrm{culture}}}{V_{\mathrm{conversion}}}=\frac{E_2}{E_{\mathrm{culture}}}\]</div>
+            </div>
+            <p class="implementation-note">Implementation: <a href="../src/expression.py">protein expression</a>, <a href="../src/leach.py">enzyme supply</a>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span><small>Complete conversion model</small>How TetH converts tetrathionate</span>
+            <span class="details-action">View equations</span>
+          </summary>
+          <div class="details-content">
+            <p>Iodine first converts part of the broth's thiosulfate into the tetrathionate substrate:</p>
+            <div class="math-display">\[\mathrm{I_2+2S_2O_3^{2-}\rightarrow 2I^-+S_4O_6^{2-}}\]</div>
+            <p>The remaining thiosulfate and newly formed tetrathionate become the two initial conditions. In the conversion vessel there are no cells, PCB particles or copper reactions, so the forward TetH reaction gives:</p>
+            <div class="math-stack">
+              <div class="math-display">\[\frac{d[S_4O_6^{2-}]}{dt}=-v\]</div>
+              <div class="math-display">\[\frac{d[S_2O_3^{2-}]}{dt}=Yv\]</div>
+            </div>
+            <p>The closed vessel also has an exact integrated solution:</p>
+            <div class="math-display">\[K_{S_4O_6}\ln\left(\frac{S_0}{S}\right)+(S_0-S)=k_{\mathrm{cat}}E_2t\]</div>
+            <p>Here, \(S_0\) is the initial tetrathionate concentration and \(S\) is its concentration at time \(t\).</p>
+            <p class="implementation-note">Implementation: <a href="../src/leach.py">conversion model</a>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span><small>Declared model conditions</small>Assumptions made in the models</span>
+            <span class="details-action">View assumptions</span>
+          </summary>
+          <div class="details-content assumption-groups">
+            <div>
+              <h4>TetH production and recovery</h4>
+              <ul>
+                <li>Protein production is represented by a linear expression model.</li>
+                <li>Biomass is held constant and growth conditions are treated as controlled.</li>
+                <li>Generic <i>E. coli</i> expression parameters are used as proxies for TetH expression.</li>
+                <li>A fixed fraction of produced TetH is treated as active.</li>
+                <li>Acid refolding is represented through the fixed active fraction rather than modelled as a separate step.</li>
+                <li>Extraction and purification are treated as lossless in the supplied model.</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Tetrathionate conversion</h4>
+              <ul>
+                <li>The active enzyme concentration is constant during the batch.</li>
+                <li>The iodine reaction and broth stoichiometry go to completion.</li>
+                <li>The vessel is well mixed and operated at the selected conditions.</li>
+                <li>pH, temperature and agitation are not dynamic model inputs.</li>
+                <li>Transfer losses and competing reactions are excluded.</li>
+                <li>Sulfur-species degradation is excluded from the current conversion trajectory.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span><small>Verification</small>How the models were checked</span>
+            <span class="details-action">View checks</span>
+          </summary>
+          <div class="details-content">
+            <p>The numerical conversion trajectory is checked against the exact integrated Michaelis–Menten solution. The full repository audit counts sulfur atoms across tetrathionate, thiosulfate and the other sulfur products rather than treating a two-species molecule count as elemental conservation.</p>
+            <p>The expression-to-enzyme interface is recomputed from the protein model so changes upstream cannot silently leave the catalytic capacity behind.</p>
+            <p class="implementation-note">Checks: <a href="../tests/test_leach.py">conversion and balances</a>, <a href="../tests/test_interfaces.py">model handover</a>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span><small>Complete evidence table</small>Parameters used by the models</span>
+            <span class="details-action">View table</span>
+          </summary>
+          <div class="details-content table-wrap">
+            <table class="parameter-table">
+              <colgroup><col><col><col><col><col></colgroup>
+              <thead>
+                <tr><th>Model</th><th>Symbol</th><th>Meaning</th><th>Current value and unit</th><th>Evidence</th></tr>
+              </thead>
+              <tbody>
+                <tr class="table-group"><th colspan="5">TetH production and recovery</th></tr>
+                <tr><td>Expression</td><td>\(\alpha\)</td><td>Transcription per plasmid copy</td><td>0.5 mRNA min<sup>−1</sup> copy<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Expression</td><td>\(N\)</td><td>Plasmid copies per cell</td><td>300 copies cell<sup>−1</sup></td><td><span class="evidence derived">Selected from range</span></td></tr>
+                <tr><td>Expression</td><td>\(\delta_m\)</td><td>mRNA degradation</td><td>0.20 min<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Expression</td><td>\(\beta\)</td><td>Translation per mRNA</td><td>4.0 protein min<sup>−1</sup> mRNA<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Expression</td><td>\(k_{\mathrm{sec}}\)</td><td>Protein processing or export</td><td>0.10 min<sup>−1</sup></td><td><span class="evidence design">Fitted</span></td></tr>
+                <tr><td>Expression</td><td>\(\delta_c\)</td><td>Intracellular protein loss</td><td>0.005 min<sup>−1</sup></td><td><span class="evidence needed">Assumed</span></td></tr>
+                <tr><td>Expression</td><td>\(\delta_s\)</td><td>Processed protein loss</td><td>0.005 min<sup>−1</sup></td><td><span class="evidence needed">Assumed</span></td></tr>
+                <tr><td>Expression</td><td>\(\mu\)</td><td>Growth dilution</td><td>0.02 min<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Expression</td><td>\(f\)</td><td>TetH-active fraction proxy</td><td>0.5</td><td><span class="evidence proxy">Model proxy</span></td></tr>
+                <tr><td>Expression</td><td>\(P_{s,\max}\)</td><td>Processing or display ceiling</td><td>1.0 × 10<sup>5</sup> sites cell<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Culture</td><td>\(X\)</td><td>Dry biomass concentration</td><td>4.0 g L<sup>−1</sup></td><td><span class="evidence design">Design choice</span></td></tr>
+                <tr><td>Recovery</td><td>\(\eta_{\mathrm{pur}}\)</td><td>Activity surviving recovery</td><td>Lossless in supplied model</td><td><span class="evidence needed">Assumed</span></td></tr>
+                <tr class="table-group"><th colspan="5">Tetrathionate conversion</th></tr>
+                <tr><td>Conversion</td><td>\(E_2\)</td><td>Active TetH charged</td><td>0.043 µmol L<sup>−1</sup></td><td><span class="evidence design">Design choice</span></td></tr>
+                <tr><td>Conversion</td><td>\(k_{\mathrm{cat}}\)</td><td>TetH turnover</td><td>125 min<sup>−1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Conversion</td><td>\(K_{S_4O_6}\)</td><td>Tetrathionate half-saturation</td><td>300 µmol L<sup>−1</sup></td><td><span class="evidence derived">Selected from range</span></td></tr>
+                <tr><td>Conversion</td><td>\(Y\)</td><td>Thiosulfate produced per tetrathionate</td><td>1</td><td><span class="evidence literature">Reaction</span></td></tr>
+                <tr><td>Broth</td><td>\([S_4O_6^{2-}]_0\)</td><td>Initial tetrathionate</td><td>23.2 mmol L<sup>−1</sup></td><td><span class="evidence derived">Recipe-derived</span></td></tr>
+                <tr><td>Broth</td><td>\([S_2O_3^{2-}]_0\)</td><td>Initial thiosulfate remaining after iodine</td><td>72.1 mmol L<sup>−1</sup></td><td><span class="evidence derived">Recipe-derived</span></td></tr>
+                <tr><td>Conversion</td><td>\(t_2\)</td><td>Selected batch duration</td><td>4,320 min</td><td><span class="evidence design">Design choice</span></td></tr>
+                <tr><td>Conversion</td><td>\(k_{\mathrm{decay}}\)</td><td>Loss of active TetH during conversion</td><td>No decay in supplied model</td><td><span class="evidence needed">Assumed</span></td></tr>
+              </tbody>
+            </table>
+            <p class="implementation-note">Parameter sources: <a href="../params/expression.yaml">protein model</a>, <a href="../params/leach.yaml">leachant model</a>.</p>
+          </div>
+        </details>
+      </div>
+
+      <section class="engineering-section" aria-labelledby="engineering-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Engineering impact</p>
+          <h3 id="engineering-title">What this stage informs</h3>
+        </div>
+        <div class="engineering-grid">
+          <article><span>Wet lab</span><p>Produce TetH in a separate culture step, then harvest, refold and purify the enzyme before conversion.</p></article>
+          <article><span>Process operation</span><p>Select enzyme loading and batch duration together rather than treating either as fixed independently.</p></article>
+          <article><span>Hardware</span><p>Use separate culture and conversion vessels with independent transfer, mixing and condition control.</p></article>
+        </div>
+      </section>
+
+      <section class="handover-stream" aria-labelledby="handover-title">
+        <div class="handover-title-block">
+          <p class="section-kicker">Handover</p>
+          <h3 id="handover-title">Passing the leachant forward</h3>
+          <p>After TetH conversion, the liquor is adjusted to the PCB-leaching conditions. Its thiosulfate and residual tetrathionate concentrations then initialise the leaching model.</p>
+        </div>
+
+        <div class="stream-layout">
+          <div class="stream-end stream-output">
+            <p class="handover-step-label">Leaves the conversion vessel</p>
+            <span class="evidence prediction">Model prediction</span>
+            <div class="stream-value">
+              <strong>94.4 mmol L<sup>&minus;1</sup></strong>
+              <span>thiosulfate, \([S_2O_3^{2-}]_{\mathrm{out}}\)</span>
+            </div>
+            <div class="stream-value">
+              <strong>0.94 mmol L<sup>&minus;1</sup></strong>
+              <span>tetrathionate left unconverted, \([S_4O_6^{2-}]_{\mathrm{out}}\)</span>
+            </div>
+            <p class="stream-aside">The conversion time sets these concentrations but does not enter the next model.</p>
+          </div>
+
+          <div class="stream-bridge">
+            <div class="stream-condition">
+              <span>Condition before PCB contact</span>
+              <strong>pH · temperature · transferred volume</strong>
+            </div>
+            <div class="stream-line" aria-hidden="true">
+              <span class="stream-origin"></span>
+              <span class="stream-condition-point"></span>
+              <span class="stream-arrow"></span>
+            </div>
+          </div>
+
+          <div class="stream-end stream-input">
+            <p class="handover-step-label">Enters the PCB-leaching model</p>
+            <span class="evidence design">Initial conditions</span>
+            <div class="stream-value">
+              <strong>\([S_2O_3^{2-}]_{\mathrm{leach},0}\)</strong>
+              <span>conditioned thiosulfate concentration</span>
+            </div>
+            <div class="stream-value">
+              <strong>\([S_4O_6^{2-}]_{\mathrm{leach},0}\)</strong>
+              <span>conditioned tetrathionate concentration</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="stream-source">Conversion model at \(t_2\): <a href="../params/leach.yaml">leachant parameters</a> · <a href="../tests/test_interfaces.py">handover check</a></p>
+      </section>
+    </section>
+
+    <section class="model-section leaching-section" id="dissolving-gold" aria-labelledby="dissolving-gold-title">
+      <div class="section-heading">
+        <span class="section-number">03</span>
+        <div>
+          <p class="section-kicker">Stage two</p>
+          <h2 id="dissolving-gold-title">Dissolving the gold</h2>
+        </div>
+      </div>
+
+      <p class="stage-question">How long can the leachant dissolve gold before copper consumes its useful thiosulfate?</p>
+
+      <div class="opening-answer leaching-answer">
+        <span class="evidence prediction">Model conclusion</span>
+        <p>The current model predicts a productive leaching window rather than continuous improvement with time. Gold dissolves while thiosulfate and an oxidant are available, but copper from the PCB creates a competing reaction that can exhaust the leachant. Ammonia, oxygen supply and batch duration therefore have to be selected together.</p>
+      </div>
+
+      <div class="leach-charge" aria-label="Materials charged to the leaching vessel">
+        <div>
+          <span>Prepared liquor</span>
+          <strong>Thiosulfate from Stage 1</strong>
+        </div>
+        <i aria-hidden="true"></i>
+        <div>
+          <span>Electronic-waste feed</span>
+          <strong>Crushed, gold-plated PCB</strong>
+        </div>
+        <i aria-hidden="true"></i>
+        <div>
+          <span>Selected reagent</span>
+          <strong>266 mmol L<sup>&minus;1</sup> ammonia</strong>
+        </div>
+        <i aria-hidden="true"></i>
+        <div>
+          <span>Hardware input</span>
+          <strong>Controlled air supply</strong>
+        </div>
+      </div>
+
+      <section class="leach-mechanism" aria-labelledby="competition-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Reaction network</p>
+          <h3 id="competition-title">Copper helps the oxidation—and spends the leachant</h3>
+        </div>
+        <p class="body-copy flush-copy">Gold can be oxidised directly by oxygen or by Cu(II). Copper metal also dissolves from the board as Cu(I), which oxygen converts back to Cu(II). That regenerated Cu(II) can support gold dissolution, but it also converts thiosulfate into tetrathionate. The ammoniacal process slows this competing loss by binding Cu(II).</p>
+
+        <figure class="pathway-figure">
+          <picture>
+            <source media="(max-width: 760px)" srcset="../docs/media/wiki/concepts/leaching-competing-pathways-v2-mobile.svg?v=8">
+            <img src="../docs/media/wiki/concepts/leaching-competing-pathways-v2.svg?v=8" alt="A timed animation of one ammonia-free leaching run. Thiosulfate markers leave the vessel. Oxygen oxidises the gold and a trace of the leachant leaves as the gold thiosulfate complex. Nearly all of it is converted to tetrathionate by Cu(II). The copper is not fed in: it comes off the board as Cu(0), dissolves as Cu(I), and oxygen re-oxidises that to Cu(II), which the reaction hands straight back as Cu(I). When the last marker is spent the routes grey out and the run halts with gold still on the remaining board fragments.">
+          </picture>
+          <figcaption>
+            <strong>One leaching run, start to exhaustion</strong>
+            <span>Oxygen oxidises the gold, and only a trace of the leachant leaves that way. Nearly all of it is converted to tetrathionate by Cu(II). Copper is not added: it comes off the board as Cu(0) and dissolves as Cu(I), and oxygen is the only thing that makes Cu(II). The parasitic step spends the Cu(II) and returns Cu(I), so oxygen keeps the loop turning until the budget is gone. The run halts when the thiosulfate is spent, not when the gold is gone, so gold stays on the remaining board fragments. The bar tracks the cycle and its restart.</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="leach-core" aria-labelledby="leach-core-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Governing model</p>
+          <h3 id="leach-core-title">Gold dissolution needs surface area, thiosulfate and an oxidant</h3>
+        </div>
+        <p class="body-copy flush-copy">The rate combines the exposed gold-film area with saturating terms for thiosulfate and the two parallel oxidant routes. If any required factor becomes small, productive leaching slows.</p>
+
+        <div class="equation-card leach-equation-card">
+          <span class="equation-label">Gold dissolution rate</span>
+          <div class="math-display">
+            \[
+            R_{Au}=a_{Au}(t)\frac{[S_2O_3^{2-}]}{K_{S_2O_3}+[S_2O_3^{2-}]}
+            \left(k_{Au,O_2}\frac{[O_2]}{K_{O_2}+[O_2]}+
+            k_{Au,Cu}\frac{[Cu(II)]}{K_{Cu(II)}+[Cu(II)]}\right)
+            \]
+          </div>
+          <p>(R_{Au}) is the gold dissolution rate, (a_{Au}) is exposed gold area, and each (K) is the concentration giving half of that pathway's maximum contribution.</p>
+        </div>
+
+        <div class="reaction-pair" aria-label="Desired and competing reactions">
+          <article>
+            <span>Desired gold reaction</span>
+            <div class="math-display compact-math">
+              \[Au^0+2S_2O_3^{2-}+Cu(II)\rightarrow Au(S_2O_3)_2^{3-}+Cu(I)\]
+            </div>
+          </article>
+          <article>
+            <span>Competing thiosulfate reaction</span>
+            <div class="math-display compact-math">
+              \[2Cu(II)+2S_2O_3^{2-}\rightarrow2Cu(I)+S_4O_6^{2-}\]
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="leach-results" aria-labelledby="productive-window-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Operating time</p>
+          <h3 id="productive-window-title">Continuing the batch does not always recover more gold</h3>
+        </div>
+        <p class="body-copy flush-copy">The model initially accumulates dissolved gold while thiosulfate is abundant. As the copper-driven loss consumes that finite budget, the gold curve levels off. This supports the document's decision to design around a one-day batch rather than assuming that a three-day residence time is automatically better.</p>
+
+        <figure class="model-figure large-figure leach-plot">
+          <img src="../docs/media/wiki/plots/dissolving-gold-productive-window.svg" alt="Two aligned plots over 72 hours. Gold recovery rises and then levels off as the thiosulfate concentration falls to zero.">
+          <figcaption>
+            <strong>The productive leaching window</strong>
+            <span>The vertical marker shows the selected 24-hour operating point. The curves are model predictions for the document's ammoniacal, fixed-oxygen scenario; experimental results can be appended without changing the section structure.</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="oxygen-story" aria-labelledby="oxygen-title">
+        <div class="oxygen-copy">
+          <p class="section-kicker">Aeration decision</p>
+          <h3 id="oxygen-title">Oxygen is both a driver and a control lever</h3>
+          <p>More oxygen accelerates oxidation early in the batch, but it also converts Cu(I) into the Cu(II) that consumes thiosulfate. The preferred oxygen strategy therefore changes with residence time and cannot be chosen independently of the batch schedule.</p>
+          <div class="oxygen-callout">
+            <span>Hardware implication</span>
+            <strong>Use adjustable aeration, not an assumed unlimited oxygen concentration.</strong>
+          </div>
+        </div>
+        <figure class="model-figure leach-plot">
+          <img src="../docs/media/wiki/plots/dissolving-gold-oxygen-strategy.svg" alt="Gold recovery versus held dissolved oxygen after 24 and 72 hours. The 24-hour result increases with oxygen, while the 72-hour result peaks at a lower oxygen level.">
+          <figcaption>
+            <strong>Oxygen strategy depends on batch duration</strong>
+            <span>The same oxygen sweep gives different decisions at 24 and 72 hours. The dashed marker is the air-saturation concentration used by the pump model, not a recommended set point.</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="leach-decisions" aria-labelledby="leach-decisions-title">
+        <div class="subsection-heading">
+          <p class="section-kicker">Engineering impact</p>
+          <h3 id="leach-decisions-title">How the model informs the process</h3>
+        </div>
+        <div class="decision-prose">
+          <p>The model links the wet-lab chemistry directly to operation of the leaching vessel. Ammonia is charged to protect thiosulfate from Cu(II), while adjustable aeration prevents oxygen from being treated as an unlimited input. The batch is stopped using the dissolved-gold and remaining-thiosulfate profiles, with one day as the current process decision.</p>
+          <p>It also defines what must be recorded for each PCB feed. Gold-film coverage controls the available gold surface, while particle size controls the exposed copper area and therefore the competing copper chemistry.</p>
+        </div>
+      </section>
+
+      <div class="technical-stack leach-technical" aria-label="Expandable leaching-model details">
+        <details>
+          <summary><span><small>Model detail</small>Complete reaction and rate model</span><span class="details-action">View equations</span></summary>
+          <div class="details-content">
+            <h4>Gold reactions</h4>
+            <div class="math-stack">
+              <div class="math-display">\[4Au^0+8S_2O_3^{2-}+O_2+2H_2O\rightarrow4Au(S_2O_3)_2^{3-}+4OH^-\]</div>
+              <div class="math-display">\[Au^0+2S_2O_3^{2-}+Cu(II)\rightarrow Au(S_2O_3)_2^{3-}+Cu(I)\]</div>
+            </div>
+            <h4>Gold-film geometry</h4>
+            <div class="math-display">\[a_{Au}=\frac{m_{Au}}{\rho_{Au}t_{film}},\qquad \frac{dn_{Au}}{dt}=-R_{Au},\qquad \frac{d[Au(S_2O_3)_2^{3-}]}{dt}=\frac{R_{Au}}{V}\]</div>
+            <p>Gold is treated as a plated film that thins at approximately constant face area until it is exhausted.</p>
+
+            <h4>Copper reactions</h4>
+            <div class="math-stack">
+              <div class="math-display">\[4Cu^0+O_2+8S_2O_3^{2-}+2H_2O\rightarrow4[Cu(S_2O_3)_2]^{3-}+4OH^-\]</div>
+              <div class="math-display">\[Cu^0+Cu^{2+}+4S_2O_3^{2-}\rightarrow2[Cu(S_2O_3)_2]^{3-}\]</div>
+              <div class="math-display">\[4Cu(I)+O_2+2H_2O\rightarrow4Cu(II)+4OH^-\]</div>
+              <div class="math-display">\[2Cu(II)+2S_2O_3^{2-}\rightarrow2Cu(I)+S_4O_6^{2-}\]</div>
+            </div>
+            <h4>Copper-particle geometry and rates</h4>
+            <div class="math-display">\[a_{Cu}(0)=\frac{6m_{Cu}}{\rho_{Cu}d},\qquad a_{Cu}(t)=a_{Cu}(0)\left(\frac{n_{Cu}}{n_{Cu}(0)}\right)^{2/3}\]</div>
+            <div class="math-stack">
+              <div class="math-display">\[v_{Cu,O_2}=k_{Cu,O_2}a_{Cu}(t)\frac{[O_2]}{K_{O_2}+[O_2]}\frac{[S_2O_3^{2-}]}{K_{S_2O_3}+[S_2O_3^{2-}]}\]</div>
+              <div class="math-display">\[v_{Cu,Cu}=k_{Cu,Cu}a_{Cu}(t)\frac{[Cu(II)]}{K_{Cu(II)}+[Cu(II)]}\frac{[S_2O_3^{2-}]}{K_{S_2O_3}+[S_2O_3^{2-}]}\]</div>
+              <div class="math-display">\[v_3=k_{par}[Cu(II)][S_2O_3^{2-}],\qquad v_4=k_{ox,Cu}[O_2][Cu(I)]\]</div>
+            </div>
+            <h4>Species balances</h4>
+            <div class="math-stack">
+              <div class="math-display">\[\frac{dn_{Cu}}{dt}=-(v_{Cu,O_2}+v_{Cu,Cu})\]</div>
+              <div class="math-display">\[\frac{d[S_2O_3^{2-}]}{dt}=-\frac{2R_{Au}}{V}-\frac{2v_{Cu,O_2}+4v_{Cu,Cu}}{V}-2v_3\]</div>
+              <div class="math-display">\[\frac{d[S_4O_6^{2-}]}{dt}=v_3\]</div>
+              <div class="math-display">\[\frac{d[Cu(I)]}{dt}=\frac{v_{Cu,O_2}+2v_{Cu,Cu}+R_{Au,Cu}}{V}+2v_3-4v_4\]</div>
+              <div class="math-display">\[\frac{d[Cu(II)]}{dt}=4v_4-\frac{v_{Cu,Cu}+R_{Au,Cu}}{V}-2v_3\]</div>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary><span><small>Hardware model</small>Oxygen transfer and pH control</span><span class="details-action">View equations</span></summary>
+          <div class="details-content">
+            <p>When oxygen is supplied by the air pump, dissolved oxygen becomes a state rather than a fixed input:</p>
+            <div class="math-display">\[\frac{d[O_2]}{dt}=k_La(C^*-[O_2])-\frac{R_{Au,O_2}+v_{Cu,O_2}}{4V}-v_4\]</div>
+            <p>(k_La) describes gas-to-liquid transfer and (C^*) is the air-saturation ceiling. The final term charges one oxygen molecule per copper re-oxidation event.</p>
+            <p>For controlled pH, the dosing system holds the set point and the model reports the titrant demand:</p>
+            <div class="math-display">\[pH=pH_{set},\qquad \frac{dAlk}{dt}=0,\qquad \frac{dDose}{dt}=-\left.\frac{dAlk}{dt}\right|_{chem}\]</div>
+          </div>
+        </details>
+
+        <details>
+          <summary><span><small>Model scope</small>Assumptions and limitations</span><span class="details-action">View assumptions</span></summary>
+          <div class="details-content assumption-groups">
+            <div>
+              <h4>Assumptions stated in the document</h4>
+              <ul>
+                <li>The vessel is well mixed and isothermal.</li>
+                <li>PCB particles are represented by a uniform geometry and gold-film thickness.</li>
+                <li>Only gold and copper affect the tracked chemistry.</li>
+                <li>Ammonia is present at 266 mmol L<sup>&minus;1</sup>.</li>
+                <li>The initial model treats oxygen as excess; the intervention replaces this with pump-limited transfer.</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Important limitations</h4>
+              <ul>
+                <li>Passivation and sulfur fouling are not represented.</li>
+                <li>Gold re-deposition onto remaining copper is not represented.</li>
+                <li>Other PCB metals and mass-transfer resistance are excluded.</li>
+                <li>Several copper and parasitic rate constants are borrowed from ammoniacal literature rather than measured in this vessel.</li>
+                <li>The predicted endpoint depends strongly on the real PCB gold-film area.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary><span><small>Wet-lab record</small>Experimental evidence</span><span class="details-action">View evidence</span></summary>
+          <div class="details-content evidence-placeholder">
+            <span class="evidence needed">To be appended</span>
+            <p>No project experimental results have been added to this stage yet. Gold, copper, thiosulfate and dissolved-oxygen measurements can be placed here when the planned leaching runs are complete.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span><small>Evidence ledger</small>Leaching parameters</span><span class="details-action">View table</span></summary>
+          <div class="details-content table-wrap">
+            <table class="parameter-table">
+              <colgroup><col><col><col><col><col></colgroup>
+              <thead><tr><th>Group</th><th>Symbol</th><th>Quantity</th><th>Value used</th><th>Evidence</th></tr></thead>
+              <tbody>
+                <tr><td>Reagent</td><td>\([NH_3]_T\)</td><td>Ammonia charge</td><td>266 mmol L<sup>&minus;1</sup></td><td><span class="evidence design">Document process</span></td></tr>
+                <tr><td>Operation</td><td>\(t_3\)</td><td>Selected batch duration</td><td>24 h</td><td><span class="evidence design">Design choice</span></td></tr>
+                <tr><td>Oxygen</td><td>\([O_2]\)</td><td>Fixed-oxygen comparison</td><td>500 µmol L<sup>&minus;1</sup></td><td><span class="evidence design">Model scenario</span></td></tr>
+                <tr><td>Oxygen</td><td>\(C^*\)</td><td>Air-saturation ceiling at 25 °C</td><td>259 µmol L<sup>&minus;1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Gold</td><td>\(k_{Au,O_2}\)</td><td>Gold rate constant, oxygen route</td><td>11 µmol m<sup>&minus;2</sup> min<sup>&minus;1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Gold</td><td>\(k_{Au,Cu}\)</td><td>Gold rate constant, ammoniacal Cu(II) route</td><td>1.5 × 10<sup>3</sup> µmol m<sup>&minus;2</sup> min<sup>&minus;1</sup></td><td><span class="evidence literature">Literature</span></td></tr>
+                <tr><td>Surface</td><td>\(t_{film}\)</td><td>Gold plating thickness</td><td>0.5 µm working value</td><td><span class="evidence needed">Assumed</span></td></tr>
+                <tr><td>Surface</td><td>\(d\)</td><td>Crushed-particle size</td><td>Feed-dependent</td><td><span class="evidence needed">Required measurement</span></td></tr>
+                <tr><td>Transfer</td><td>\([S_2O_3^{2-}]_0\)</td><td>Initial thiosulfate</td><td>Output from Stage 1</td><td><span class="evidence prediction">Model handover</span></td></tr>
+                <tr><td>Transfer</td><td>\([S_4O_6^{2-}]_0\)</td><td>Initial tetrathionate</td><td>Output from Stage 1</td><td><span class="evidence prediction">Model handover</span></td></tr>
+              </tbody>
+            </table>
+            <p class="implementation-note">Values are centralised in <a href="../params/leach.yaml">the leaching parameter file</a>. Document-specified process choices take priority in this wiki draft.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span><small>Verification</small>Model checks and implementation</span><span class="details-action">View links</span></summary>
+          <div class="details-content">
+            <p>The implementation checks non-negative inventories, reaction stoichiometry, sulfur accounting, metal exhaustion, the copper redox loop and oxygen-transfer bookkeeping.</p>
+            <div class="source-links">
+              <a href="../src/leach.py">Leaching implementation</a>
+              <a href="../docs/make_wiki_leaching_figures.py">Figure builder</a>
+              <a href="../tests/test_leach.py">Leaching tests</a>
+              <a href="../tests/test_interfaces.py">Handover tests</a>
+              <a href="../docs/EQUATIONS.md">Equation reference</a>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <section class="leach-handover" id="leach-to-capture" aria-labelledby="capture-stream-title">
+        <div class="handover-title-block">
+          <p class="section-kicker">Leach-to-capture handover</p>
+          <h3 id="capture-stream-title">The dissolved-metal liquor leaves the PCB solids behind</h3>
+          <p>At the selected endpoint, the solids are separated from the liquor. The dissolved gold concentration becomes the capture model's feed, while residual sulfur species, copper, pH and transferred volume define the conditions that the capture stage must receive.</p>
+        </div>
+
+        <div class="leach-stream" aria-label="Material stream from PCB leaching to gold capture">
+          <div class="leach-stream-origin">
+            <span>Leaching vessel</span>
+            <strong>PCB solids + reacting liquor</strong>
+          </div>
+          <div class="leach-stream-line" aria-hidden="true">
+            <span class="stream-particle p1"></span><span class="stream-particle p2"></span><span class="stream-particle p3"></span>
+          </div>
+          <div class="solid-separation">
+            <span>Separate solids</span>
+            <strong>Clarified leach liquor</strong>
+          </div>
+          <div class="leach-stream-line final" aria-hidden="true">
+            <span class="stream-particle p1"></span><span class="stream-particle p2"></span>
+          </div>
+          <div class="leach-stream-destination">
+            <span>Capture-model input</span>
+            <strong>\(Au_{feed}=[Au(S_2O_3)_2^{3-}]\)</strong>
+          </div>
+        </div>
+
+        <div class="handover-ledger">
+          <span>Also carried forward</span>
+          <p>residual thiosulfate · tetrathionate · dissolved copper · transferred volume · conditioning requirement</p>
+        </div>
+        <p class="stream-source">Interface definition: <a href="../src/interfaces.py">leach-to-capture handover</a> · evidence status: model prediction until leachate measurements are appended.</p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,103 @@
+name: Deploy wiki preview to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/deploy-wiki-pages.yml"
+      - "wiki-prototype/**"
+      - "docs/media/wiki/**"
+      - "docs/EQUATIONS.md"
+      - "docs/make_wiki_leaching_figures.py"
+      - "params/expression.yaml"
+      - "params/leach.yaml"
+      - "src/expression.py"
+      - "src/interfaces.py"
+      - "src/leach.py"
+      - "tests/test_interfaces.py"
+      - "tests/test_leach.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build the public wiki bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p _site/docs/media/wiki/concepts
+          mkdir -p _site/docs/media/wiki/plots
+          mkdir -p _site/docs _site/params _site/src _site/tests
+
+          cp -a wiki-prototype/. _site/
+
+          cp docs/media/wiki/concepts/overview-process-draft-embedded.svg _site/docs/media/wiki/concepts/
+          cp docs/media/wiki/concepts/leaching-competing-pathways-v2.svg _site/docs/media/wiki/concepts/
+          cp docs/media/wiki/concepts/leaching-competing-pathways-v2-mobile.svg _site/docs/media/wiki/concepts/
+          cp docs/media/wiki/plots/making-teth-culture-requirement.svg _site/docs/media/wiki/plots/
+          cp docs/media/wiki/plots/making-thiosulfate-conversion.svg _site/docs/media/wiki/plots/
+          cp docs/media/wiki/plots/dissolving-gold-productive-window.svg _site/docs/media/wiki/plots/
+          cp docs/media/wiki/plots/dissolving-gold-oxygen-strategy.svg _site/docs/media/wiki/plots/
+
+          cp docs/EQUATIONS.md docs/make_wiki_leaching_figures.py _site/docs/
+          cp params/expression.yaml params/leach.yaml _site/params/
+          cp src/expression.py src/interfaces.py src/leach.py _site/src/
+          cp tests/test_interfaces.py tests/test_leach.py _site/tests/
+
+          sed -i 's#\.\./#./#g' _site/index.html
+          touch _site/.nojekyll
+
+      - name: Check the public bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f _site/index.html
+          test -f _site/styles.css
+          test -f _site/script.js
+          test -f _site/docs/media/wiki/concepts/overview-process-draft-embedded.svg
+          test -f _site/docs/media/wiki/concepts/leaching-competing-pathways-v2.svg
+          test -f _site/docs/media/wiki/concepts/leaching-competing-pathways-v2-mobile.svg
+          test -f _site/docs/media/wiki/plots/making-teth-culture-requirement.svg
+          test -f _site/docs/media/wiki/plots/making-thiosulfate-conversion.svg
+          test -f _site/docs/media/wiki/plots/dissolving-gold-productive-window.svg
+          test -f _site/docs/media/wiki/plots/dissolving-gold-oxygen-strategy.svg
+
+          if grep -qE '(src|href|srcset)="\.\./' _site/index.html; then
+            echo "A parent-relative link remains in the deployed page."
+            exit 1
+          fi
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

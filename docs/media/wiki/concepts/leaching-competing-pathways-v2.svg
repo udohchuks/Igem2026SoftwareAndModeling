@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" role="img" aria-labelledby="ttl dsc">
+<title id="ttl">Thiosulfate is a finite reaction budget</title>
+<desc id="dsc">A timed run. Thiosulfate markers leave a vessel of crushed circuit-board fragments. Oxygen oxidises the gold, and the marker leaves as the gold thiosulfate complex; only a trace of the leachant takes that route. Nearly all of it meets copper two, which converts it to tetrathionate and is itself rebuilt from copper one by oxygen, so the loop keeps spending the budget. Two fragments of seven dissolve. When the last marker is spent the routes grey out and the run halts with gold still on the remaining fragments. A bar along the bottom tracks the cycle and its restart.</desc>
+<defs>
+<linearGradient id="liquor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6f4f4"/><stop offset="1" stop-color="#bfe1e1"/></linearGradient>
+<clipPath id="clipWaste"><circle cx="760" cy="340" r="38"/></clipPath>
+<marker id="aGold" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto"><path class="ar filg" d="M0 0L11 5.5L0 11Z" fill="#b98524"/></marker>
+<marker id="aCopper" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto"><path class="ar filc" d="M0 0L11 5.5L0 11Z" fill="#9a6040"/></marker>
+<marker id="aViolet" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refX="9.5" refY="5.5" orient="auto"><path class="ar filv" d="M0 0L11 5.5L0 11Z" fill="#8d73a8"/></marker>
+<style>.eyebrow{font:700 11px Inter,Segoe UI,sans-serif;letter-spacing:.09em;text-transform:uppercase;fill:#74746f}.heading{font:500 21px Georgia,serif;fill:#252523}.label{font:700 13px Inter,Segoe UI,sans-serif;fill:#252523}.copy{font:400 12px Inter,Segoe UI,sans-serif;fill:#74746f}.tiny{font:400 11px Inter,Segoe UI,sans-serif;fill:#8b8b85}.route{fill:none;stroke-linecap:round}.an,.ar{animation-duration:15s;animation-iteration-count:infinite;animation-timing-function:linear}.tk{offset-rotate:0deg}.tk0{animation-name:mv0,fd0}.sk0{animation-name:st0}.tk1{animation-name:mv1,fd1}.sk1{animation-name:st1}.tk2{animation-name:mv2,fd2}.sk2{animation-name:st2}.tk3{animation-name:mv3,fd3}.sk3{animation-name:st3}.tk4{animation-name:mv4,fd4}.sk4{animation-name:st4}.tk5{animation-name:mv5,fd5}.sk5{animation-name:st5}.tk6{animation-name:mv6,fd6}.sk6{animation-name:st6}.tk7{animation-name:mv7,fd7}.sk7{animation-name:st7}.tk8{animation-name:mv8,fd8}.sk8{animation-name:st8}.tk9{animation-name:mv9,fd9}.sk9{animation-name:st9}.fr1{animation-name:fr1}.fr4{animation-name:fr4}.grain{opacity:0;transform-box:fill-box;transform-origin:center;animation-name:grain}.meterW{transform-box:fill-box;animation-name:mWaste}.rg{animation-name:dimg}.rc{animation-name:dimc}.rv{animation-name:dimv}.filg{animation-name:filg}.filc{animation-name:filc}.filv{animation-name:filv}.halt{opacity:0;animation-name:halt}.vessel{animation-name:vessel}.sweep{transform-box:fill-box;transform-origin:left center;animation-name:sweep,barcol}.head{animation-name:head}@keyframes mv0{0%,6.667%{offset-distance:0%}20.000%,100%{offset-distance:100%}}@keyframes fd0{0%,6.667%{opacity:0}7.467%,19.200%{opacity:1}20.000%,100%{opacity:0}}@keyframes st0{0%,6.000%{opacity:1}8.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv1{0%,12.667%{offset-distance:0%}35.333%,100%{offset-distance:100%}}@keyframes fd1{0%,12.667%{opacity:0}13.467%,34.533%{opacity:1}35.333%,100%{opacity:0}}@keyframes st1{0%,12.000%{opacity:1}14.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv2{0%,18.667%{offset-distance:0%}41.333%,100%{offset-distance:100%}}@keyframes fd2{0%,18.667%{opacity:0}19.467%,40.533%{opacity:1}41.333%,100%{opacity:0}}@keyframes st2{0%,18.000%{opacity:1}20.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv3{0%,24.667%{offset-distance:0%}47.333%,100%{offset-distance:100%}}@keyframes fd3{0%,24.667%{opacity:0}25.467%,46.533%{opacity:1}47.333%,100%{opacity:0}}@keyframes st3{0%,24.000%{opacity:1}26.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv4{0%,30.667%{offset-distance:0%}53.333%,100%{offset-distance:100%}}@keyframes fd4{0%,30.667%{opacity:0}31.467%,52.533%{opacity:1}53.333%,100%{opacity:0}}@keyframes st4{0%,30.000%{opacity:1}32.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv5{0%,36.667%{offset-distance:0%}59.333%,100%{offset-distance:100%}}@keyframes fd5{0%,36.667%{opacity:0}37.467%,58.533%{opacity:1}59.333%,100%{opacity:0}}@keyframes st5{0%,36.000%{opacity:1}38.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv6{0%,42.667%{offset-distance:0%}65.333%,100%{offset-distance:100%}}@keyframes fd6{0%,42.667%{opacity:0}43.467%,64.533%{opacity:1}65.333%,100%{opacity:0}}@keyframes st6{0%,42.000%{opacity:1}44.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv7{0%,48.667%{offset-distance:0%}71.333%,100%{offset-distance:100%}}@keyframes fd7{0%,48.667%{opacity:0}49.467%,70.533%{opacity:1}71.333%,100%{opacity:0}}@keyframes st7{0%,48.000%{opacity:1}50.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv8{0%,54.667%{offset-distance:0%}77.333%,100%{offset-distance:100%}}@keyframes fd8{0%,54.667%{opacity:0}55.467%,76.533%{opacity:1}77.333%,100%{opacity:0}}@keyframes st8{0%,54.000%{opacity:1}56.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes mv9{0%,60.667%{offset-distance:0%}83.333%,100%{offset-distance:100%}}@keyframes fd9{0%,60.667%{opacity:0}61.467%,82.533%{opacity:1}83.333%,100%{opacity:0}}@keyframes st9{0%,60.000%{opacity:1}62.000%,95.333%{opacity:.10}100%{opacity:1}}@keyframes fr1{0%,26.333%{opacity:1}29.667%,95.333%{opacity:0}100%{opacity:1}}@keyframes fr4{0%,54.333%{opacity:1}57.667%,95.333%{opacity:0}100%{opacity:1}}@keyframes grain{0%,20.000%{opacity:0;transform:scale(.4)}22.000%,95.333%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.4)}}@keyframes mWaste{0%,34.000%{transform:translateY(0)}35.333%,40.000%{transform:translateY(-8.28px)}41.333%,46.000%{transform:translateY(-16.55px)}47.333%,52.000%{transform:translateY(-24.83px)}53.333%,58.000%{transform:translateY(-33.10px)}59.333%,64.000%{transform:translateY(-41.38px)}65.333%,70.000%{transform:translateY(-49.65px)}71.333%,76.000%{transform:translateY(-57.93px)}77.333%,82.000%{transform:translateY(-66.20px)}83.333%,95.333%{transform:translateY(-74.48px)}100%{transform:translateY(0)}}@keyframes halt{0%,84.000%{opacity:0}85.667%,95.333%{opacity:1}100%{opacity:0}}@keyframes dimg{0%,84.000%{stroke:#b98524}85.667%,95.333%{stroke:#d5d5d1}100%{stroke:#b98524}}@keyframes filg{0%,84.000%{fill:#b98524}85.667%,95.333%{fill:#d5d5d1}100%{fill:#b98524}}@keyframes dimc{0%,84.000%{stroke:#9a6040}85.667%,95.333%{stroke:#d5d5d1}100%{stroke:#9a6040}}@keyframes filc{0%,84.000%{fill:#9a6040}85.667%,95.333%{fill:#d5d5d1}100%{fill:#9a6040}}@keyframes dimv{0%,84.000%{stroke:#8d73a8}85.667%,95.333%{stroke:#d5d5d1}100%{stroke:#8d73a8}}@keyframes filv{0%,84.000%{fill:#8d73a8}85.667%,95.333%{fill:#d5d5d1}100%{fill:#8d73a8}}@keyframes vessel{0%,84.000%{opacity:1}85.667%,95.333%{opacity:.5}100%{opacity:1}}@keyframes sweep{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}@keyframes head{0%{transform:translateX(0)}100%{transform:translateX(836px)}}@keyframes barcol{0%,84.000%{fill:#2d9297}85.667%,100%{fill:#c6c6c2}}@media(prefers-reduced-motion:reduce){.an,.ar{animation:none}.tk{display:none}.grain{opacity:1;transform:scale(1)}.meterW{transform:translateY(-74.48px)}.fr1,.fr4{opacity:0}.halt{opacity:1}.stock{opacity:.10}.route{stroke:#d5d5d1}.ar{fill:#d5d5d1}.vessel{opacity:.5}.sweep{transform:scaleX(1);fill:#c6c6c2}.head{transform:translateX(836px)}}</style></defs>
+<rect width="900" height="620" fill="#fbfbfa"/>
+<text x="32" y="38" class="eyebrow">Inside the leaching vessel</text>
+<text x="32" y="69" class="heading">Thiosulfate is a finite reaction budget</text>
+<path d="M32 90H868" stroke="#e7e7e3"/>
+<text x="42" y="112" class="eyebrow">Thiosulfate &#183; controlled air</text>
+<g class="an vessel">
+<rect x="40" y="118" width="210" height="150" rx="18" fill="url(#liquor)" stroke="#9fc9c9"/>
+<path d="M40 152Q145 162 250 152" fill="none" stroke="#8dbfbf" stroke-width="1.5"/>
+</g>
+<text x="56" y="144" class="label" style="fill:#1f6f73">S&#8322;O&#8323;&#178;&#8315;</text>
+<circle class="stock an sk0" cx="52" cy="202" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk1" cx="98" cy="196" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk2" cx="148" cy="200" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk3" cx="198" cy="200" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk4" cx="240" cy="196" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk5" cx="62" cy="250" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk6" cx="112" cy="252" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk7" cx="162" cy="252" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk8" cx="212" cy="250" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<circle class="stock an sk9" cx="242" cy="230" r="4" fill="#2d9297" stroke="#eef7f6" stroke-width="1.2"/>
+<g>
+<polygon points="61.4,174.1 70.8,171.8 78.6,175.7 76.2,183.5 66.9,184.2 61.4,180.3" fill="#2f5a44"/>
+<circle cx="70.8" cy="178" r="2.2" fill="#d5ae47"/>
+<circle class="an halt" cx="70.8" cy="178" r="5.5" fill="none" stroke="#b98524" stroke-width="1.5"/>
+</g>
+<g class="an fr1">
+<polygon points="111.4,166.1 120.8,163.8 128.6,167.7 126.2,175.5 116.9,176.2 111.4,172.3" fill="#2f5a44"/>
+<circle cx="120.8" cy="170" r="2.2" fill="#d5ae47"/>
+</g>
+<g>
+<polygon points="166.4,176.1 175.8,173.8 183.6,177.7 181.2,185.5 171.9,186.2 166.4,182.3" fill="#2f5a44"/>
+<circle cx="175.8" cy="180" r="2.2" fill="#d5ae47"/>
+<circle class="an halt" cx="175.8" cy="180" r="5.5" fill="none" stroke="#b98524" stroke-width="1.5"/>
+</g>
+<g>
+<polygon points="216.4,168.1 225.8,165.8 233.6,169.7 231.2,177.5 221.9,178.2 216.4,174.3" fill="#2f5a44"/>
+<circle cx="225.8" cy="172" r="2.2" fill="#d5ae47"/>
+<circle class="an halt" cx="225.8" cy="172" r="5.5" fill="none" stroke="#b98524" stroke-width="1.5"/>
+</g>
+<g class="an fr4">
+<polygon points="86.4,218.1 95.8,215.8 103.6,219.7 101.2,227.5 91.9,228.2 86.4,224.3" fill="#2f5a44"/>
+<circle cx="95.8" cy="222" r="2.2" fill="#d5ae47"/>
+</g>
+<g>
+<polygon points="141.4,222.1 150.8,219.8 158.6,223.7 156.2,231.5 146.9,232.2 141.4,228.3" fill="#2f5a44"/>
+<circle cx="150.8" cy="226" r="2.2" fill="#d5ae47"/>
+<circle class="an halt" cx="150.8" cy="226" r="5.5" fill="none" stroke="#b98524" stroke-width="1.5"/>
+</g>
+<g>
+<polygon points="201.4,218.1 210.8,215.8 218.6,219.7 216.2,227.5 206.9,228.2 201.4,224.3" fill="#2f5a44"/>
+<circle cx="210.8" cy="222" r="2.2" fill="#d5ae47"/>
+<circle class="an halt" cx="210.8" cy="222" r="5.5" fill="none" stroke="#b98524" stroke-width="1.5"/>
+</g>
+<text x="145" y="292" text-anchor="middle" class="copy">Crushed PCB fragments</text>
+<text x="145" y="310" text-anchor="middle" class="tiny an halt" style="fill:#8a6b28">Gold still on the board</text>
+<text x="330" y="128" class="eyebrow" style="fill:#94691e">Desired reaction</text>
+<path d="M250 168C330 142 440 134 556 148" class="route an rg" stroke="#b98524" stroke-width="3" marker-end="url(#aGold)"/>
+<text x="322" y="190" class="tiny">O&#8322; oxidises the gold</text>
+<circle cx="604" cy="158" r="42" fill="#fdf8ea" stroke="#e3cd91" stroke-width="2"/>
+<circle class="grain an" cx="604" cy="158" r="13" fill="#d5ae47"/>
+<text x="656" y="150" class="label">Dissolved gold</text>
+<text x="656" y="168" class="copy">Au(S&#8322;O&#8323;)&#8322;&#179;&#8315;</text>
+<text x="656" y="186" class="tiny" style="fill:#8a6b28">a trace of the leachant</text>
+<path d="M250 240C360 280 460 316 700 336" class="route an rv" stroke="#8d73a8" stroke-width="7" marker-end="url(#aViolet)"/>
+<text x="470" y="284" class="eyebrow" style="fill:#755a8a">Competing reaction</text>
+<text x="470" y="300" class="tiny" style="fill:#755a8a">nearly all of the leachant</text>
+<circle cx="760" cy="340" r="40" fill="#f7f3fa" stroke="#cfbddb" stroke-width="2"/>
+<g clip-path="url(#clipWaste)"><rect class="an meterW" x="720" y="380" width="80" height="160" fill="#c8b4d8" opacity=".9"/></g>
+<circle cx="760" cy="340" r="40" fill="none" stroke="#cfbddb" stroke-width="2"/>
+<text x="760" y="345" text-anchor="middle" class="label" style="fill:#3f2f4f">S&#8324;O&#8326;&#178;&#8315;</text>
+<text x="760" y="400" text-anchor="middle" class="copy">tetrathionate</text>
+<path d="M250 264C312 324 372 398 436 430" class="route an rc" stroke="#9a6040" stroke-width="2.5" marker-end="url(#aCopper)"/>
+<text x="430" y="478" text-anchor="end" class="tiny">Cu&#8304; off the board, dissolving as Cu(I)</text>
+<circle cx="470" cy="440" r="28" fill="#f4e8e0" stroke="#d3aa91" stroke-width="2"/>
+<text x="470" y="445" text-anchor="middle" class="label" style="fill:#8a5738">Cu(I)</text>
+<circle cx="620" cy="440" r="28" fill="#f4e8e0" stroke="#d3aa91" stroke-width="2"/>
+<text x="620" y="445" text-anchor="middle" class="label" style="fill:#8a5738">Cu(II)</text>
+<path d="M620 412C606 376 592 346 570 334C548 346 500 400 480 424" class="route an rc" stroke="#9a6040" stroke-width="2.5" marker-end="url(#aCopper)"/>
+<path d="M478 468C520 496 570 496 612 468" class="route an rc" stroke="#9a6040" stroke-width="2.5" marker-end="url(#aCopper)"/>
+<text x="545" y="524" text-anchor="middle" class="copy">O&#8322; re-oxidises Cu(I), the only source of Cu(II)</text>
+<circle class="tk tk0 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 168C330 142 440 134 562 150')"/>
+<circle class="tk tk1 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk2 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk3 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk4 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk5 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk6 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk7 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk8 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<circle class="tk tk9 an" r="6" fill="#2d9297" stroke="#fbfbfa" stroke-width="1.4" style="offset-path:path('M250 240C360 280 460 316 706 336')"/>
+<rect x="32" y="552" width="836" height="6" rx="3" fill="#ececea"/>
+<rect class="an sweep" x="32" y="552" width="836" height="6" rx="3" fill="#2d9297"/>
+<path d="M734.2 546V564" stroke="#c6c6c2"/>
+<circle class="an head" cx="32" cy="555" r="5" fill="#fbfbfa" stroke="#8b8b85" stroke-width="1.6"/>
+<text x="32" y="580" class="tiny">Leaching</text>
+<text x="740.2" y="580" class="tiny">Thiosulfate exhausted &#183; run halts</text>
+<text x="32" y="602" class="copy">Ammonia-free run. Oxygen dissolves the gold. Cu(II) takes almost all of the thiosulfate and oxygen keeps rebuilding it, so the leachant runs out first.</text>
+</svg>

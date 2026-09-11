@@ -2,12 +2,245 @@
 # Values transcribed verbatim from the parameter tables. Nothing corrected.
 # status: sourced | calibrate | operating_choice | unmeasured | geometry
 # Unit system: umol/L, minutes, mol, m, m^2.
+#
+# ---------------------------------------------------------------------------
+# PART I IS THE THREE-VESSEL SEQUENTIAL PROCESS.
+#   Stage 1  culture vessel      grow cells, harvest and purify TetH
+#   Stage 2  conversion vessel   purified TetH + tetrathionate broth
+#   Stage 3  leach vessel        thiosulfate liquor + crushed board
+#
+# A one-pot design was also written. It was RETIRED on 2026-08-12 and nothing
+# in src/ implements it any more. Its write-up and MATLAB file stay unchanged
+# in docs/source/sequential_2026-08-12/ so the record survives.
+#
+# The sequential model supplied a value for every parameter this file carried
+# as `value: null`. Each one below now holds that value, with its source, and
+# with anything it superseded kept beside it. The audit that cleared them is
+# ISSUES.md item 36; it reproduced fourteen of fourteen reported numbers and
+# confirmed that sulfur, copper and gold all balance.
+#
+# The author's `'split'` stoichiometry is chemically identical to this
+# repository's stoichiometry="balanced". Two authors fixed ISSUES item 18 the
+# same way, independently.
+# ---------------------------------------------------------------------------
 
 meta:
   part: I
   source: docs/source/Bioleaching Models.docx
+  source_sequential: docs/source/sequential_2026-08-12/Bioleaching_Models_Sequential.docx
   concentration_unit: umol/L
   time_unit: min
+  architecture:
+    value: sequential
+    status: team_decision
+    note: >-
+      Three vessels, adopted 2026-08-12 as the Part I process. The one-pot
+      design is retired and no longer implemented. ISSUES.md item 36.
+    retired_2026_08_12:
+      value: simultaneous
+      source: docs/source/sequential_2026-08-12/Bioleaching_Models_Simultaneous.docx
+      reason: >-
+        Needed TetH to fold and turn over on a living E. coli surface at pH 7,
+        which the literature says it does not do. ISSUES.md item 32. The
+        three-vessel design refolds the enzyme outside the cell, which is the
+        published procedure.
+
+# ---------------------------------------------------------------------------
+# enzyme_capacity is NOT a transcription of the source table. It is this
+# repository's replacement for the k_syn x k_cat pair, which no measurement can
+# separate. See ISSUES.md item 13. The transcribed originals are kept below,
+# unchanged, under enzyme_production.k_syn and tetrathionate.k_cat.
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# REBUILT 2026-08-11. The team confirmed E. coli is the organism throughout,
+# and that the thiosulfate is made by that E. coli, not bought.
+#
+# The previous version of this block derived Vmax from Eccleston & Kelly's
+# growth yield and maintenance coefficient for Acidithiobacillus ferrooxidans.
+# That argument only works for an organism whose whole energy budget runs
+# through tetrathionate. E. coli's does not. Those numbers are retired below,
+# unchanged, under retired_A_ferrooxidans_route.
+#
+# The route now is the one that fits an engineered host:
+#     Vmax = k_cat * [TetH]
+# with k_cat from tetrathionate.k_cat and [TetH] from Part II's expression
+# cascade pointed at TetH instead of GolB. See ISSUES.md item 30.
+# ---------------------------------------------------------------------------
+enzyme_capacity:
+  # !! BLOCKING, 2026-08-11. ISSUES.md item 32.
+  # Four papers report that TetH expressed in E. coli forms INACTIVE inclusion
+  # bodies, and that activity is recovered only by refolding at pH 4 in vitro.
+  # Its catalytic optimum is pH 3.0 and its mechanism needs a protonated
+  # Asp325, so it cannot turn over at the pH E. coli lives at.
+  # Every number in this block assumes TetH folds and works on an E. coli
+  # surface at pH ~7. The literature says it does not.
+  # TREAT Vmax BELOW AS UNVALIDATED until the team answers item 32.
+  organism:
+    value: Escherichia coli
+    status: team_decision
+    note: "Confirmed 2026-08-11. Same organism in Parts I, II and III."
+  route:
+    value: expression
+    status: team_decision
+    note: >-
+      Vmax = k_cat * [TetH]. Computed by
+      src/leach.py :: vmax_from_expression(teth_per_cell, cells_per_L, k_cat).
+  teth_per_cell:
+    value: 23301
+    unit: molecules/cell
+    meaning: Active TetH displayed per cell at steady state
+    status: derived_from_part_II
+    note: >-
+      CHANGED 2026-08-19 from 2749 with Part II's copy number, N = 20 -> 300.
+      IT SIZES THE CULTURE AND NOTHING ELSE. Stage 2 and Stage 3 do not read
+      it; gold at 72 h is identical to 4 decimal places either way. What it
+      changes is the largest capital item in Part I: about 2.35 L of culture
+      per litre of conversion vessel becomes about 0.28 L.
+      CORRECTED 2026-08-21. Both of those ratios were computed at biomass
+      1.7 g/L, which this file left behind; at the 4.0 g/L below the live route
+      needs 0.12 L per litre. REVIEW.md 2.1 still sizes the culture on the
+      retired k_syn route and gets 9.1 L, 77x more. Neither proxy has been
+      measured for TetH. ISSUES.md item 68; pinned by tests/test_leach.py ::
+      test_two_enzyme_routes_disagree_77x.
+      THE BACKBONE IS NOW CONFIRMED FOR TetH TOO. This note said the opposite
+      until 2026-08-20, when the team named the vector: TetH and GolB are both
+      on pJUMP24-1A(sfGFP), OriV #4, pRO1600/ColE1, high copy. The two
+      constructs share one plasmid, so N = 300 is not an assumption carried
+      over from GolB, it is the same number for the same backbone.
+      WHAT THE SHARED VECTOR DOES NOT FIX. pJUMP24-1A is a Level 1 acceptor:
+      the promoter and RBS are inserted parts, so alpha and beta may still
+      differ between the two constructs. The backbone fixes N and the host.
+      ISSUES.md item 67.
+    superseded:
+      value: 2749
+      reason: >-
+        Part II's cascade at N = 20, the pBR322-like assumption. Retired
+        2026-08-19 when the wet lab confirmed a pUC-type backbone for GolB.
+    derivation: >-
+      Part II's cascade run with TetH in place of GolB. P_s = 46602 molecules
+      per cell from the ODE, times f = 0.5 folded and active. Every cascade
+      parameter except f is generic to the host and the display scaffold, not
+      to GolB: alpha promoter, N plasmid copies, beta RBS, k_sec scaffold,
+      delta_m, delta_c, delta_s, mu.
+    caveat: >-
+      f = 0.5 is Part II's fitted folding fraction for GolB. For TetH the
+      published expectation at neutral pH is NOT 0.5 but close to zero: it
+      aggregates into inclusion bodies in E. coli and needs acid refolding.
+      f scales Vmax linearly, so Vmax is not a lower bound. See ISSUES.md
+      item 32, which supersedes the softer wording of item 30.
+    source: "params/expression.yaml; src/expression.py :: simulate"
+  localisation:
+    value: surface_displayed
+    status: design_choice
+    note: >-
+      TetH must meet tetrathionate in the bulk liquid, so P_s is used, not the
+      cytoplasmic pool P_c = 1454. Native TetH in A. ferrooxidans is
+      periplasmic, so this matches its natural compartment. If TetH is instead
+      left cytoplasmic, use P_c and add a tetrathionate transport term, which
+      no document currently has.
+  cells_per_g:
+    value: 2.36e+12   # the +  is required; YAML reads 2.36e12 as a string
+    unit: cells/g dry weight
+    meaning: Conversion between the cell count and the dry weight
+    status: sourced
+    note: >-
+      E. coli, interpolated at OUR growth rate. Must NOT be used for
+      A. ferrooxidans, which is smaller. Corrected 2026-08-11 from 3.57e12,
+      which was a slow-growth value. See ISSUES.md item 33.
+    superseded:
+      value: 3.57e+12
+    source: "params/conversions.yaml :: cells_per_g_dry_weight [S30]"
+  biomass:
+    value: 4.0
+    unit: g dry weight/L
+    meaning: Dry cell mass per litre of culture
+    status: operating_choice
+    note: >-
+      Chosen 2026-08-11 to reach Vmax = 14.3, the capacity the retired route
+      claimed at 0.1 g/L. A normal aerobic E. coli batch reaches 3 to 5 g/L
+      without special effort, so this is not demanding. See the table under
+      Vmax for what other biomass levels give.
+    source: null
+  Vmax:
+    value: 80.36
+    unit: umol.L^-1.min^-1
+    meaning: >-
+      Top speed of the whole culture at breaking down tetrathionate,
+      = k_cat*[TetH]. At biomass 4.0 g/L.
+    status: derived_from_part_II
+    derivation: >-
+      23301 molecules/cell x 4.0 g/L x 2.36e12 cells/g / 6.022e23
+      = 0.3653 umol/L of TetH. Times k_cat 220 /min = 80.36 umol/L/min.
+    superseded_2026_08_19:
+      value: 9.49
+      reason: >-
+        The same arithmetic at teth_per_cell = 2749, before Part II's copy
+        number moved from 20 to 300. ISSUES.md item 61.
+    superseded:
+      value: 14.3
+      reason: >-
+        Used cells_per_g = 3.57e12, a slow-growth value, for a culture the
+        model runs at a 35 min doubling. ISSUES.md item 33.
+    scales_with_biomass:
+      0.1: 2.009
+      0.5: 10.045
+      1.0: 20.089
+      4.0: 80.358
+      10.0: 200.895
+      30.0: 602.684
+    note: >-
+      CORRECTED 2026-08-20. The derivation above, this table and the sentence
+      below were all left at teth_per_cell = 2749 when the value moved to
+      80.36 on 2026-08-19, so the file contradicted itself for a day.
+      ISSUES.md item 66.
+      About 7x weaker per gram of cells than the retired A. ferrooxidans
+      route, because the cells are not built to do this. Biomass is the lever.
+      0.71 g/L would give 14.3, the number the retired route claimed at
+      0.1 g/L. Biomass is kept at 4.0.
+    dimer_ambiguity_cancels: >-
+      teth_per_cell counts monomers, so k_cat = 110 /min per subunit is the
+      matching pair. 220 /min per dimer with half as many dimers gives the
+      identical Vmax. ISSUES.md item 15's factor of 2 does not reach this
+      number.
+    source: "params/expression.yaml + tetrathionate.k_cat [S1]"
+  k_Vmax:
+    value: null
+    unit: umol.cell^-1.min^-1
+    meaning: >-
+      Lumped build constant, = k_cat*k_syn. Only needed if the standalone
+      enzyme ODE is integrated from an inoculum. The expression route makes
+      this unnecessary: Part II's cascade already carries the build-up, with
+      growth dilution applied per cell where it belongs. Obtain it with
+      src/leach.py :: k_Vmax_from_steady_state(Vmax, X, k_deg, mu) if needed.
+    status: derive_at_use
+    source: null
+
+  # Retired, kept on the record. Do not use these for E. coli.
+  retired_A_ferrooxidans_route:
+    status: retired_2026_08_11
+    reason: >-
+      Wrong organism. These describe a chemolithotroph whose whole energy
+      budget runs through tetrathionate. E. coli has no native tetrathionate
+      metabolism, so growth yield and maintenance on tetrathionate are not
+      defined for it.
+    growth_rate_on_tetrathionate:
+      value: 0.092
+      unit: h^-1
+      source: "[S5] Eccleston & Kelly 1978, J. Bacteriol."
+    growth_yield:
+      value: 12.2
+      unit: g dry weight/mol tetrathionate
+      source: "[S5] Eccleston & Kelly 1978"
+    maintenance_coefficient:
+      value: 1.01
+      unit: mmol tetrathionate.g^-1.h^-1
+      source: "[S5] Eccleston & Kelly 1978"
+    specific_demand:
+      value: 142.5
+      unit: umol.g^-1.min^-1
+    Vmax_at_0.1_g_per_L:
+      value: 14.3
+      unit: umol.L^-1.min^-1
 
 enzyme_production:
   k_syn:
@@ -16,6 +249,29 @@ enzyme_production:
     meaning: Enzyme synthesis rate per cell
     status: calibrate
     source: null
+    # Not a value. A literature-derived estimate, kept separate so that
+    # values() still omits k_syn and a run without it fails loudly.
+    # See ISSUES.md items 13 and 14. Prefer lumping k_cat*k_syn instead.
+    literature_estimate:
+      value: 1.4e-16
+      unit: umol.cell^-1.min^-1
+      status: derived_from_proxies
+      derivation: >-
+        (0.28 U/mg crude extract / 2.2 U/mg purified) x protein_per_cell
+        / 100 kDa x k_deg. Gives ~77,000 TetH molecules per cell.
+      assumed_inputs:
+        protein_per_cell:
+          value: 1.0e-13
+          unit: g/cell
+          status: assumed
+          note: dominant uncertainty; scales k_syn linearly
+      source: >-
+        Kanao et al. 2023 J. Biosci. Bioeng. (2.2 +/- 0.37 U/mg purified
+        Af-Tth); Protze et al. 2011 Front. Microbiol. (0.28 U/mg in
+        tetrathionate-grown cell-free extract, Acidianus ambivalens)
+      caveat: >-
+        Cross-species: extract activity is archaeal, purified activity is
+        Acidithiobacillus. Proxy, not a measurement.
   k_deg:
     value: 1.1e-3
     unit: min^-1
@@ -23,11 +279,25 @@ enzyme_production:
     status: sourced
     source: "[4] Maurizi 1992"
   mu:
-    value: 0.0
+    value: 0.02
     unit: min^-1
-    meaning: Growth-dilution rate (= ln2/t_double); 0 if no growth
-    status: sourced
-    source: "[3] Alon 2019"
+    meaning: Growth rate of the host, = ln2/t_double, t_double approx 35 min
+    status: adopted_from_part_II
+    superseded:
+      value: 0.0
+      status: sourced
+      source: "[3] Alon 2019"
+      reason: >-
+        The source assumed fixed biomass. The team confirmed the cells grow.
+        Same organism as Parts II and III, so the same 1.2 h^-1 = 0.02 min^-1
+        applies. ISSUES.md items 12, 29 and 30.
+    frame_note: >-
+      In the expression route this mu acts INSIDE Part II's per-cell cascade,
+      where growth genuinely dilutes an intracellular concentration. It must
+      NOT also be applied as -mu*Vmax to the bulk quantity: growing cells
+      raise bulk enzyme per litre, they do not lower it. Vmax follows biomass
+      through X instead. ISSUES.md item 12.
+    source: "params/expression.yaml :: mu"
   X:
     value: null
     unit: cell/L
@@ -36,33 +306,219 @@ enzyme_production:
     source: null
 
 tetrathionate:
-  F_in:
-    value: null
-    unit: umol.L^-1.min^-1
-    meaning: Tetrathionate feed rate
-    status: operating_choice
-    source: null
+  # F_in, the tetrathionate feed rate, was removed on 2026-08-12. There is no
+  # feed in a three-vessel process: the broth is charged once into Stage 2 and
+  # never topped up. It was always zero; now it does not exist. ISSUES.md 36.
   k_cat:
-    value: null
+    value: 220
     unit: min^-1
-    meaning: Turnover number of TetH
-    status: calibrate
-    note: "unmeasured --- calibrate"
-    source: "[1] Kanao 2024"
-  K_m:
-    value: null
+    meaning: Turnover number of TetH, per 100 kDa dimer
+    status: sourced
+    source: "[S1] Kanao et al. 2023, J. Biosci. Bioeng."
+    derivation: >-
+      2.2 +/- 0.37 U/mg, the specific activity of purified Af-Tth expressed in
+      A. ferrooxidans. 1 mg of a 100 kDa protein is 0.01 umol, so
+      k_cat = 2.2 / 0.01 = 220 /min = 3.7 /s.
+    organism_caveat: >-
+      THIS IS THE A. FERROOXIDANS FIGURE and our host is E. coli. [S1] reports
+      2.5 +/- 0.18 U/mg for the same enzyme acid-refolded from E. coli
+      inclusion bodies, which is 250 /min on this dimer basis. The two overlap
+      inside their own error bars. Stage 2 does not use this value, it uses
+      k_cat_per_subunit below, and gold at 72 h moves 28.49 % to 28.62 %
+      across the whole 110 to 250 range. Recorded rather than resolved.
+    alternative_value:
+      value: 110
+      unit: min^-1
+      basis: per 50 kDa subunit
+      status: sourced
+      source: "[S1] Kanao et al. 2023, J. Biosci. Bioeng."
+      note: >-
+        Use this if each subunit carries its own active site. The sources do
+        not settle which is right. Carry both. Factor of 2, no more.
+    reconciliation_2026_08_12: >-
+      Part I's two models both use 125 min^-1, from 2.5 U/mg on a 50 kDa
+      basis. On the face of it that disagrees with the 220 above by 1.76x.
+      It does not, or not by much. The 1.76x is two separate factors:
+        mass basis        100 kDa dimer vs 50 kDa subunit   = 2.0x
+        specific activity 2.2 U/mg vs 2.5 U/mg              = 1.14x
+      Put on the same subunit basis, this file says 110 and Part I says 125.
+      That is a 14 % disagreement in a measured specific activity, not a
+      structural one. Both are kept. See k_cat_per_subunit below, and
+      ISSUES.md item 34, which is about a different and much larger split.
+  k_cat_per_subunit:
+    value: 125
+    unit: min^-1
+    meaning: Turnover number of TetH, per 50 kDa subunit, Part I's value
+    status: sourced
+    derivation: >-
+      2.5 U/mg, the specific activity [S1] reports for Af-Tth acid-refolded
+      from E. coli inclusion bodies, which is our host. 1 mg of a 50 kDa
+      subunit is 0.02 umol, so k_cat = 2.5 / 0.02 = 125 /min.
+    source: "[S1] Kanao et al. 2023; docs/source/sequential_2026-08-12/"
+    note: >-
+      THIS IS THE ONE THE SEQUENTIAL STAGE 2 USES, because sequential.E_stage2
+      is a concentration of 50 kDa subunits. Pairing it with the 220 dimer
+      value would double-count the dimer.
+      REPAIRED 2026-08-20. This block carried two derivations, two notes and
+      two sources; YAML keeps the last of each silently, so the derivation on
+      file described the 220 dimer value and not this one. The 220 material
+      now sits on k_cat, where it belongs. ISSUES.md item 66.
+      The choice barely matters: gold recovery at 72 h is 28.16 % at 110,
+      28.49 % at 125 and 28.62 % at 220. Stage 3 contains no enzyme, so k_cat
+      only sets how long Stage 2 takes and how much culture it needs. What it
+      does move is the Stage 2 conversion: 85.57 % at 110, 95.94 % at 125 and
+      100 % at 220. That is ISSUES.md item 57.
+      The source table marks this "unmeasured --- calibrate". That label is
+      wrong: specific activity IS k_cat once divided by molar mass. The source
+      document is unchanged. See ISSUES.md item 15.
+  K_S4O6:
+    value: 300
     range: [50, 2400]
     unit: umol/L
     meaning: Michaelis constant
-    status: sourced_range
-    source: "[2] Kanao 2007"
-  k1:
-    value: null
+    status: chosen_from_sourced_range
+    note: >-
+      Chosen 2026-08-12. Part I's author picked 300 from the 50 to 2400
+      species range and used it in both models. This closes ISSUES.md item 17,
+      which had held the range open with no chosen value.
+      The choice barely matters here: tetrathionate
+      starts at 23200 umol/L, so the saturating factor is 0.987 at t = 0 and
+      Stage 2 runs at Vmax for almost its whole length.
+    source: "[2] Kanao 2007, range; docs/source/sequential_2026-08-12/, choice"
+  k_par:
+    value: 1.20e-5
     unit: L.umol^-1.min^-1
-    meaning: Parasitic Cu(II)-thiosulfate rate constant
-    status: calibrate
-    note: "increases without NH3"
-    source: "[6][7]"
+    meaning: >-
+      Rate constant for 2Cu(II) + 2S2O3 -> 2Cu(I) + S4O6. Governs BOTH the
+      sulfur side (sections 2 and 3) and the copper side (section 5). The
+      source table split this into k1 and k3; see ISSUES.md item 16.
+    status: sourced_by_proxy
+    note: >-
+      "increases without NH3". Value supplied 2026-08-12 from both of Part I's
+      models, which set k1 = k3 = 1e-5 and so agree with this repository that
+      it is one constant.
+      THIS IS THE MOST CONSEQUENTIAL NUMBER IN PART I. It destroys 98.2 % of
+      the thiosulfate charge in the sequential run. Gold recovery at 72 h is
+      100 % at 1e-6, 38.4 % at 1e-5 and 25.8 % at 1e-4. The value is borrowed
+      from ammoniacal systems, where ammonia deliberately stabilises Cu(II).
+      An ammonia-free system may be substantially faster. Measure it first.
+      CHANGED 2026-08-19 from 1.0e-5 to 1.20e-5, the ammonia-free value. The
+      note above predicted exactly this: without ammonia competing for Cu(II),
+      more Cu(II) is free to attack thiosulfate, so the constant rises. It
+      moves together with k_Au_Cu, which fell from 1500 to 21.0 on the same
+      day for the same reason. Taking one without the other would put an
+      ammoniacal constant and an ammonia-free constant in the same solution.
+      This is STILL the most consequential number in Part I, and it is still
+      not measured for a waste-PCB feed. ISSUES.md item 54.
+    superseded:
+      value: 1.0e-5
+      reason: >-
+        Ammoniacal value, k1 = k3 = 1e-5 in both of Part I's models. Retired
+        2026-08-19 with k_Au_Cu when the team chose glycine over ammonia.
+    source: "[6] Byerley 1973; [7] Breuer & Jeffrey 2003"
+  alkaline_decay_on:
+    value: false
+    meaning: Whether tetrathionate decomposes in alkali back to thiosulfate
+    status: operating_choice
+    note: >-
+      Added 2026-08-19. FALSE by default, so nothing already reported moves.
+      Switch it on deliberately, and only together with pH_balance.pH_set.
+      Without it, tetrathionate made by the parasitic reaction is a permanent
+      dead end and the pH pump has nothing to act on: pH changes no rate
+      anywhere in the model. With it, pH becomes the process lever it is in
+      the real vessel.
+      IT IS THE LARGEST SINGLE TERM IN THE MODEL and it rests on the least
+      certain constant. Read k_alk before switching it on.
+    source: "team decision 2026-08-19"
+  k_alk:
+    value: 16.8
+    unit: L.mol^-1.min^-1
+    meaning: >-
+      Rate constant for 4 S4O6(2-) + 6 OH- -> 5 S2O3(2-) + 2 S3O6(2-) + 3 H2O.
+      First order in hydroxide and first order in tetrathionate. Hydroxide is
+      in mol/L here, NOT umol/L, because that is the unit the rate was
+      measured in; tetrathionate stays in umol/L.
+    status: sourced_secondary
+    note: >-
+      THE WEAKEST NUMBER IN PART I, and the one carrying the most weight.
+      Reported range 0.18 to 0.38 L/mol/s; 0.28 is the midpoint, and
+      0.28 x 60 = 16.8 L/mol/min in this file's time unit.
+      IT HAS NOT BEEN READ IN THE PRIMARY LITERATURE. Rolia & Chakrabarti 1982
+      and Zhang & Dreisinger 2002 are both paywalled and every value here came
+      through a secondary source. A paper request is open. Do not put a number
+      that depends on this in a report until one of those two is read.
+      The spread itself is harmless: across the whole 0.18 to 0.38 band the
+      final pH moves by about 0.01. What is not harmless is that the constant
+      might be wrong by an order of magnitude, or measured at a temperature
+      this model does not run at.
+    source: "secondary only; primary sources not yet obtained"
+  nu_S2_S4:
+    value: 1.25
+    unit: dimensionless
+    meaning: Thiosulfate returned per tetrathionate decomposed, = 5/4
+    status: stoichiometric
+    note: >-
+      NOT FITTED. Read off the balanced equation
+      4 S4O6 + 6 OH- -> 5 S2O3 + 2 S3O6 + 3 H2O, and pinned by the sulfur
+      audit: 4 = 2 x 1.25 + 3 x 0.50. Changing it breaks conservation, which
+      is the point of having it as a named number rather than a literal.
+    source: "balanced equation"
+  nu_S3_S4:
+    value: 0.50
+    unit: dimensionless
+    meaning: Trithionate produced per tetrathionate decomposed, = 2/4
+    status: stoichiometric
+    note: >-
+      NOT FITTED. Same balanced equation as nu_S2_S4.
+      THIS IS WHY THE RETURN LEG IS NOT FREE. Only five of every eight sulfur
+      atoms in the decomposed tetrathionate come back as thiosulfate; the
+      other three leave as trithionate, which nothing consumes at 25 C. Push
+      the pH up and you recycle faster AND you sink sulfur faster.
+    source: "balanced equation"
+  nu_OH_S4:
+    value: 1.50
+    unit: dimensionless
+    meaning: Hydroxide consumed per tetrathionate decomposed, = 6/4
+    status: stoichiometric
+    note: "NOT FITTED. Same balanced equation as nu_S2_S4."
+    source: "balanced equation"
+  trithionate_hydrolysis_on:
+    value: false
+    meaning: Whether trithionate hydrolyses back towards thiosulfate
+    status: operating_choice
+    note: >-
+      Added 2026-08-19. FALSE by default and it CANNOT be switched on until
+      k_tri has a value, because k_tri is null and raises.
+      It exists so that k_tri is wired to something. Before this, k_tri was
+      declared in this file and read by no code at all: obtaining the 25 C
+      value and setting it would have changed nothing, silently. A parameter
+      that is ignored is worse than one that raises. Model audit, 2026-08-19.
+    source: "team decision 2026-08-19"
+  k_tri:
+    value: null
+    unit: min^-1
+    meaning: >-
+      Trithionate hydrolysis, S3O6(2-) + H2O -> S2O3(2-) + SO4(2-) + 2 H+.
+      FIRST ORDER in trithionate, so the unit is min^-1 and not the
+      L.mol^-1.min^-1 this entry carried until 2026-08-19. Unlike the
+      tetrathionate route this reaction is not hydroxide-dependent, so there
+      is no second concentration in the rate law and no second unit.
+    status: unmeasured
+    note: >-
+      HELD NULL DELIBERATELY, so that using it raises rather than guessing.
+      The reported measurements are at 70 to 85 C. There is no 25 C value.
+      With no value, trithionate is a terminal sink and the model says so; if
+      it turns out to hydrolyse appreciably at 25 C, the sulfur comes back and
+      the picture improves for two separate reasons: more thiosulfate, and
+      less polythionate handed to GolB.
+      CONSEQUENCE OF LEAVING IT NULL: trithionate accumulates. It is not
+      bookkeeping, it is where most of the sulfur ends up, and it is the
+      species ISSUES.md item 60 is about.
+      NOTE THE PROTONS. This route makes two per trithionate. The leach as a
+      whole is net base-producing, so the pump is delivering acid; a proton
+      source therefore REDUCES the acid demand. Measured: -63,890 umol/L of
+      titrant at pH 10.3 without it, -47,079 with k_tri = 1e-4.
+    source: null
 
 thiosulfate:
   Y:
@@ -71,12 +527,15 @@ thiosulfate:
     meaning: Stoichiometric yield (S2O3 per S4O6)
     status: sourced
     source: "[1]"
-  V:
-    value: null
+  V_R:
+    value: 1.0
     unit: L
     meaning: Reactor volume
     status: operating_choice
-    source: null
+    note: >-
+      One litre in both of Part I's models, and the basis every per-litre
+      figure in this file is quoted on. Set 2026-08-12.
+    source: "docs/source/sequential_2026-08-12/, both write-ups"
 
 gold_leaching:
   rho_Au:
@@ -86,46 +545,142 @@ gold_leaching:
     status: sourced
     source: null
   t_film:
-    value: null
+    value: 0.5e-6
     range: [0.05e-6, 1.0e-6]
     unit: m
     meaning: Gold plating thickness
-    status: board_spec
-    source: null
+    status: team_assumption
+    note: >-
+      ASSUMED 2026-08-12 by team decision. The feed is mixed electronic waste,
+      not boards from a named supplier, so there is no specification to obtain
+      and waiting for one was not a real option. 0.5e-6 m is the midpoint of
+      the range Part I gives, and it is the value both of Part I's models use.
+      THE ASSUMPTION STILL CARRIES THE RESULT. Exposed area goes as 1/t_film,
+      so the range is a 20x span in leaching rate. In the full sequential run
+      that becomes a 5.2x span in gold recovered at 72 h:
+          0.05 um -> 100 %      0.5 um -> 38.4 %      1.0 um -> 19.2 %
+      Mixed waste genuinely contains both ends. Immersion-gold surface finishes
+      are sub-tenth-micron and cover most of the board area; hard gold on edge
+      connectors is around a micron and covers very little of it. What the
+      model needs is the area-weighted mean over the actual feed, and 0.5e-6
+      is a stated midpoint, not a measurement of that mean.
+      Quote recoveries with the assumption named. ISSUES.md item 19 stays open
+      for that reason: the number is chosen, the uncertainty is not removed.
+    superseded:
+      value: null
+      reason: >-
+        Held null as board_spec until 2026-08-12, waiting for a supplier
+        specification that a mixed e-waste feed will never have.
+    source: "team assumption; range from docs/source/sequential_2026-08-12/"
   k_Au_O2:
-    value: 11
+    value: 11.4
     unit: umol.m^-2.min^-1
     meaning: Gold rate constant, O2 route
     status: sourced
-    note: "approx 11 (1.9e-7 mol m^-2 s^-1)"
-    source: "[9][10]"
+    note: >-
+      1.9e-7 mol m^-2 s^-1 converted exactly: 1.9e-7 x 60 x 1e6 = 11.4.
+      Raised from 11 on 2026-08-12 to match the conversion rather than round
+      it. Same measurement, same sources; the change moves nothing.
+    superseded:
+      value: 11
+      reason: "Rounded transcription of the same 1.9e-7 mol m^-2 s^-1."
+    source: "[9] Zhang & Nicol 2003; [10] Sitando 2018"
   k_Au_Cu:
-    value: null
+    value: 21.0
     unit: umol.m^-2.min^-1
-    meaning: Gold rate constant, Cu(II) route
-    status: sourced_relative
-    note: "approx 10^3 x larger than k_Au_O2"
-    source: "[11][12]"
+    meaning: Gold rate constant, Cu(II) route, AMMONIA-FREE
+    status: sourced
+    note: >-
+      CHANGED 2026-08-19 from 1500 to 21.0. The 1500 is the ammoniacal value:
+      it is measured in solutions where ammonia holds Cu(II) as the
+      cupric-tetraammine complex, which is the strong oxidant that makes the
+      Cu(II) route fast. This project chose GLYCINE over ammonia on
+      2026-08-19, so the ammoniacal constant no longer describes the vessel.
+      The ammonia-free value is 21.0.
+      CONSEQUENCE: the Cu(II) oxidant route stops mattering. f_Cu peaks near
+      0.015, so R_Au is carried essentially entirely by the O2 route and the
+      rate curve no longer rises to a Cu(II)-driven peak. Gold at 72 h falls
+      from about 41 % to about 29 %. That fall is not a regression; the old
+      figure described a reactor this project is not building.
+      k_par MUST move with this one. Both describe the same solution.
+      See ISSUES.md item 54 for why glycine, not ammonia.
+    superseded:
+      value: 1500
+      reason: >-
+        Ammoniacal PCB optimum, adopted 2026-08-12. Retired 2026-08-19 when
+        the team chose glycine: ammonia is volatile and would be stripped by
+        the air pump, so no ammoniacal constant applies.
+      superseded:
+        value: null
+        reason: "Was held null because only the ratio to k_Au_O2 was published."
+    source: "[11] Aylmore & Muir 2001; [12] Maharaj 2024"
   K_O2:
     value: 50
     unit: umol/L
     meaning: O2 half-saturation
-    status: calibrate
-    note: "calibrate (~50)"
-    source: null
-  K_S:
-    value: 5.0e+4
+    status: sourced
+    note: >-
+      Was "calibrate (~50)". Part I's author cites [10] for the same 50 in
+      both models, so the placeholder label is retired. Value unchanged.
+    source: "[10] Sitando 2018"
+  K_S2O3:
+    value: 3376
     unit: umol/L
     meaning: Thiosulfate half-saturation
-    status: calibrate
-    note: "calibrate (~5e4)"
-    source: null
-  K_Cu:
-    value: null
+    status: sourced
+    note: >-
+      CHANGED 2026-08-19 from 3900 to 3376. Same measurement, better average.
+      K_S2O3 = 1/K_ads with K_ads measured at 172 to 510 M^-1. The top of that
+      band is 3.0x the bottom, so the band is MULTIPLICATIVE and its centre is
+      the geometric mean, not the arithmetic one:
+        geometric  sqrt(172 x 510) = 296 M^-1  ->  K_S2O3 = 3376 umol/L
+        arithmetic (172 + 510)/2   = 341 M^-1  ->  K_S2O3 = 2933 umol/L
+      Note the 3900 it replaces was the midpoint of the RECIPROCALS
+      (1960 and 5800), which is a third and different average again. Three
+      defensible centres from one band; the geometric mean of the measured
+      quantity is the correct one.
+      The change is small: gold at 72 h moves by well under a point.
+      ADOPTED 2026-08-12 over this repository's own placeholder. = 1/K_ads,
+      with K_ads measured at 172 to 510 M^-1, so the sourced band is 1960 to
+      5800 umol/L and 3900 is its midpoint.
+      AGENTS.md section 6 step 3 decides this: a sourced value beats a stated
+      placeholder. The old 5.0e4 carried `status: calibrate` and the note
+      "calibrate (~5e4)", which is a placeholder by its own admission, and it
+      sat 8.6x above the top of the measured band.
+      This is a 1.5x lever on the headline result. Gold recovery at 72 h in
+      the sequential run is 28.49 % at 3376, 28.18 % at 3900 and 19.12 % at
+      5e4. Those three were 38.4 % and 22.6 % before the ammonia-free
+      constants of ISSUES.md item 54; recomputed 2026-08-20, item 66.
+      Pinned by tests/test_leach.py ::
+      test_K_S2O3_sourced_value_beat_the_repository_placeholder.
+    superseded:
+      value: 3900
+      reason: >-
+        Midpoint of the reciprocal band, adopted 2026-08-12. Retired
+        2026-08-19 for the geometric mean of K_ads itself.
+      superseded:
+        value: 5.0e+4
+        status: calibrate
+        reason: >-
+          A placeholder with no source, 8.6x above the top of the measured
+          1/K_ads band. Lost to a sourced value under AGENTS.md section 6.
+    source: "[18] Senanayake 2005, J. Colloid Interface Sci. 286, 253"
+  K_CuII:
+    value: 5.0e+4
     unit: umol/L
     meaning: Cu(II) half-saturation
-    status: calibrate
-    source: null
+    status: sourced
+    note: >-
+      Supplied 2026-08-12. Large by design: gold leaching stays first order in
+      Cu(II) up to about 0.15 M, so half-saturation sits at or above that
+      scale. Cu(II) never exceeds 829 umol/L in the sequential run, so f_Cu
+      stays below 0.017 and the Cu(II) route never approaches its rate
+      constant. This is why k_Au_Cu being 132x k_Au_O2 does not make the
+      Cu(II) route 132x faster.
+    superseded:
+      value: null
+      reason: "Was held null with status calibrate."
+    source: "[12] Maharaj 2024"
 
 copper:
   rho_Cu:
@@ -135,36 +690,589 @@ copper:
     status: sourced
     source: null
   d:
-    value: null
+    value: 6.0e-3
     range: [2.0e-3, 6.0e-3]
     unit: m
     meaning: Crushed particle size
     status: operating_choice
-    note: "your feed"
-    source: null
+    note: >-
+      "your feed". 6 mm chosen 2026-08-12, the coarse end of the range.
+      COARSER IS BETTER HERE, WHICH IS NOT THE USUAL RULE. Gold recovery at
+      72 h is 26.0 % at 2 mm, 33.1 % at 4 mm and 38.4 % at 6 mm. Finer
+      crushing exposes more copper, which makes more Cu(II), which destroys
+      more thiosulfate. Gold sits in a film whose area does not depend on
+      crush size at all, so finer crushing buys gold nothing and costs it the
+      leachant. Part I's author left this sweep commented out and the result
+      appears in neither write-up. Recorded here 2026-08-12.
+    source: "docs/source/sequential_2026-08-12/, operating choice"
   k_Cu_O2:
-    value: null
+    value: 200
     unit: umol.m^-2.min^-1
     meaning: Copper rate constant, O2 route
-    status: calibrate
-    note: "Ea approx 25.8 kJ/mol"
-    source: "[13]"
+    status: sourced
+    note: >-
+      "Ea approx 25.8 kJ/mol". Value supplied 2026-08-12. Closes ISSUES.md
+      item 8 together with k_Au_Cu.
+    superseded:
+      value: null
+      reason: "Was held null with status calibrate."
+    source: "[13] Salinas-Rodriguez 2022"
   k_Cu_Cu:
-    value: null
+    value: 200
     unit: umol.m^-2.min^-1
     meaning: Copper rate constant, Cu(II) route
-    status: calibrate
-    source: null
-  k3:
-    value: null
-    unit: L.umol^-1.min^-1
-    meaning: Parasitic (Cu(II)+S2O3) rate constant
-    status: calibrate
-    note: "approx equal to k1"
-    source: "[6][7]"
-  k4:
-    value: null
+    status: assumed_equal_to_k_Cu_O2
+    note: >-
+      Supplied 2026-08-12 as 200, the same as k_Cu_O2. Part I's write-up
+      labels this one "(calibrate)" while its table gives 200, so it is an
+      assumption of equality, not a measurement. Kept separate from
+      k_Cu_O2 so that measuring one does not silently move the other.
+    superseded:
+      value: null
+      reason: "Was held null with status calibrate."
+    source: "docs/source/sequential_2026-08-12/, assumed equal to k_Cu_O2"
+  # k3 in the source table was a second constant for the SAME reaction that
+  # tetrathionate.k_par governs: 2Cu(II) + 2S2O3 -> 2Cu(I) + S4O6. One
+  # reaction cannot have two rates, so k3 is gone and tetrathionate.k_par is
+  # used on both the sulfur and the copper side. This closes ISSUES.md item 16.
+  # The source table is unchanged; it still lists k3 "approx equal to k1".
+  k_ox_Cu:
+    value: 1.0e-4
     unit: L.umol^-1.min^-1
     meaning: Cu(I) re-oxidation rate constant
-    status: calibrate
+    status: sourced_by_proxy
+    note: >-
+      Supplied 2026-08-12. This closes ISSUES.md item 20, which held that
+      Model B collapses to Model A unless k_ox_Cu is large enough to build a
+      Cu(II) pool, and that no value existed. At 1e-4 the pool does build:
+      gold recovery at 72 h is 28.8 % under Model A and 38.4 % under Model B,
+      so the Cu(II) oxidant route is worth 9.6 percentage points.
+      Same ammoniacal-literature caveat as k_par.
+    superseded:
+      value: null
+      reason: "Was held null with status calibrate."
+    source: "[7] Breuer & Jeffrey 2003"
+
+# ===========================================================================
+# EVERYTHING BELOW WAS ADDED 2026-08-12.
+# These blocks did not exist before. They carry the feed basis, the broth
+# recipe, the oxygen level, the three-vessel operating choices and the proton
+# balance, all from Part I's sequential model. See ISSUES.md item 35.
+# ===========================================================================
+
+# What is actually in the reactor. The old file had rho_Au and rho_Cu but no
+# metal masses, so no area or inventory could be computed from it alone.
+feed_basis:
+  pcb_loading:
+    value: 100
+    unit: g/L
+    meaning: Crushed printed circuit board powder per litre of liquor
+    status: operating_choice
+    note: "10 % pulp density."
+    source: "docs/source/sequential_2026-08-12/"
+  m_Au:
+    value: 2.0e-5
+    unit: kg
+    meaning: Gold on the boards, per litre of liquor
+    status: sourced
+    note: >-
+      20 mg, being 0.02 wt% of 100 g of board. A typical assay. Gives
+      n_Au(0) = 101.5 umol at M_Au = 196.97 g/mol.
+    source: "docs/source/sequential_2026-08-12/, typical PCB assay"
+  m_Cu:
+    value: 3.0e-2
+    unit: kg
+    meaning: Copper on the boards, per litre of liquor
+    status: sourced
+    note: >-
+      30 g, being 30 wt% of 100 g of board. Gives n_Cu(0) = 472069 umol at
+      M_Cu = 63.55 g/mol, a copper to gold molar ratio of 4649 to 1.
+      Copper is quantitatively irrelevant as a product and decisive as a
+      reagent sink: 0.18 % of it dissolving is enough to destroy the whole
+      thiosulfate charge.
+    source: "docs/source/sequential_2026-08-12/, typical PCB assay"
+  M_Au:
+    value: 0.19697
+    unit: kg/mol
+    meaning: Molar mass of gold
+    status: sourced
+    source: "IUPAC standard atomic weight"
+  M_Cu:
+    value: 0.06355
+    unit: kg/mol
+    meaning: Molar mass of copper
+    status: sourced
+    source: "IUPAC standard atomic weight"
+
+# The leachant is not synthesised from nothing. It is a bought broth whose
+# composition fixes two initial conditions. This derivation is new information
+# from the sequential write-up, not a modelling choice.
+broth:
+  derivation: >-
+    The 46 g/L base powder contains 30 g/L Na2S2O3.5H2O and NO tetrathionate.
+    Tetrathionate is generated in situ when the iodine solution, 6 g I2 plus
+    5 g KI in 20 mL, is added at the point of use:
+        I2 + 2 S2O3^2- -> 2 I- + S4O6^2-
+    Iodine is limiting, so only part of the thiosulfate is converted.
+        30 g/L / 248.18 g/mol   = 120.88 mmol thiosulfate
+        6 g    / 253.81 g/mol   =  23.64 mmol iodine
+    in a final 1.02 L:
+        S4O6 = 23.64 / 1.02              = 23.2 mM
+        S2O3 = (120.88 - 47.28) / 1.02   = 72.1 mM
+    Reproduced to three significant figures by the audit, ISSUES.md item 35.
+  S4O6_initial:
+    value: 23200
+    unit: umol/L
+    meaning: Tetrathionate charged, from the iodine addition
+    status: derived_from_recipe
+    source: "docs/source/sequential_2026-08-12/, Stage 2 feed composition"
+  S2O3_initial:
+    value: 72100
+    unit: umol/L
+    meaning: Thiosulfate left unconverted in the broth
+    status: derived_from_recipe
+    note: >-
+      This is NOT a model output. Three quarters of the leachant is present
+      before the enzyme does anything.
+    source: "docs/source/sequential_2026-08-12/, Stage 2 feed composition"
+
+oxygen:
+  O2:
+    value: 500
+    unit: umol/L
+    meaning: Dissolved oxygen, held constant
+    status: operating_choice
+    note: >-
+      Sparged and held, so f_O2 = 0.91 throughout and never limits anything.
+      This is an assumption, not a result. A real reactor would show depletion
+      during peak copper oxidation. Part I's author says so in his Limitations
+      section. There is no mass-transfer term in either model.
+    source: "docs/source/sequential_2026-08-12/"
+  O2_dynamic:
+    value: false
+    meaning: Whether dissolved oxygen is a state fed by the air pump
+    status: operating_choice
+    note: >-
+      Added 2026-08-19 from v5's Intervention 1. FALSE by default, so nothing
+      already reported moves. With it true, O2 stops being an imposed constant
+      and becomes a balance between pump supply and the reactions that use it.
+      This is the change v5 gets the most from, and this repository already
+      agreed with it from the other direction: the constant-O2 sweep has an
+      interior optimum near 80 umol/L, far below the imposed 500.
+    source: "docs/source/Bioleaching_Models_v5.docx, Intervention 1"
+  kLa:
+    value: 1.68
+    unit: min^-1
+    meaning: Volumetric oxygen mass-transfer coefficient
+    status: derived_from_correlation
+    note: >-
+      Van't Riet non-coalescing correlation, kLa = 0.002 (P/V)^0.70 u_g^0.20,
+      with P/V = 307.2 W/m^3 and u_g = 1.06e-3 m/s. Both derive from the
+      equipment numbers below.
+      IT IS A CORRELATION FITTED ON OTHER PEOPLE'S VESSELS, not a measurement
+      of this one. A gassing-out experiment would replace it and should. v5
+      says so itself in its assumptions.
+      The non-coalescing form is chosen because a 94 mM thiosulfate liquor is
+      full of dissolved ions, which stop bubbles merging.
+    source: "[Van't Riet 1979]; equipment values in v5 Intervention 1"
+  C_star:
+    value: 259
+    unit: umol/L
+    meaning: Dissolved-oxygen saturation concentration, air, 25 C
+    status: sourced
+    note: >-
+      Air-saturated water at 25 C with a small salting-out correction.
+      Cross-checked against Henry's law, k_H = 769 L.atm/mol.
+      NOTE IT IS BELOW THE IMPOSED 500. The old constant-O2 baseline was not
+      merely an assumption, it was ABOVE what air can dissolve at all. Only
+      pure-oxygen sparging reaches 500. Switching O2_dynamic on therefore
+      lowers oxygen for two separate reasons, and both of them help.
+    source: "APHA Standard Methods DO tables"
+  O2_initial:
+    value: 259
+    unit: umol/L
+    meaning: Dissolved oxygen at the start of the leach
+    status: operating_choice
+    note: "Air-saturated at t = 0, i.e. C_star. The liquor sits in air first."
+    source: "docs/source/Bioleaching_Models_v5.docx, Intervention 1"
+
+# The ligand that stops Cu(II) destroying the leachant.
+# Chosen 2026-08-19: glycine, not ammonia. ISSUES.md item 54.
+ligand:
+  gly_on:
+    value: false
+    meaning: Whether glycine speciation suppresses the parasitic reaction
+    status: operating_choice
+    note: >-
+      FALSE by default, so nothing already reported moves. Requires G_T,
+      eps_gly and pH_balance.pH_set, and raises without them.
+    source: "team decision 2026-08-19"
+  G_T:
+    value: null
+    unit: umol/L
+    meaning: Total glycine charged to the leach vessel
+    status: operating_choice
+    note: >-
+      Held null because the dose is not chosen. The published glycine-
+      thiosulfate work uses about 0.27 M, i.e. 2.7e5 in this file's unit, and
+      that is the figure the recommendation in ISSUES.md item 54 was computed
+      at. It is a starting point for a sweep, not a set point.
     source: null
+  eps_gly:
+    value: null
+    unit: dimensionless
+    meaning: >-
+      Reactivity of copper glycinate toward thiosulfate, RELATIVE to free
+      Cu(2+). 1.0 means glycine does nothing; 0.0 means the complex is inert.
+    status: unmeasured
+    note: >-
+      HELD NULL DELIBERATELY. This one number sets the entire size of the
+      glycine benefit and NOBODY HAS MEASURED IT. Its consequence is published
+      but not the constant itself: thiosulfate consumption falls from 5.2 to
+      2.2 g/L when glycine is added, a 58 % reduction. Calibrating against
+      that observable, and never against gold, gives about 0.012.
+      Re-calibrating under five different operating conditions gives 0.0024 to
+      0.0421, a 17x spread, so the single-constant form is an approximation.
+      The RECOMMENDATION survives the whole band; the NUMBER does not. Quote
+      the band, never the point.
+      Two caveats. The 5.2 to 2.2 g/L measurement is on an auriferous ORE with
+      copper dosed at 5 mM, while a waste PCB is 30 wt% copper and makes its
+      own continuously. And the published work runs at 30 to 60 C while this
+      model is isothermal at 25 C.
+      The wet lab can pin it in one experiment: two leaches, same feed, same
+      pH, one with glycine and one without, thiosulfate assayed at 6, 24, 48 h.
+    source: null
+  pKa2_gly:
+    value: 9.78
+    unit: dimensionless
+    meaning: Second acid dissociation constant of glycine, NH3+CH2COO- / Gly-
+    status: sourced
+    note: >-
+      Gly- is the chelating form, so this is why every glycine-thiosulfate
+      paper reports a pH 9.3 to 10.5 window and why the leach cannot run
+      below about 9.3. It is the mechanistic explanation for ISSUES.md item
+      23's pH window, which had none before.
+      Gly- fraction: 0.25 at pH 9.3, 0.62 at 10.0, 0.77 at 10.3, 0.84 at 10.5.
+      The gain flattens above 10.3, which is one of the three reasons not to
+      push the pump higher.
+    source: "standard, 25 C"
+  logB1_CuGly:
+    value: 8.62
+    unit: dimensionless
+    meaning: log beta1 for Cu(2+) + Gly- -> CuGly+
+    status: sourced
+    note: "Standard stability constant, 25 C, I = 0.1."
+    source: "IUPAC stability constant compilations"
+  logB2_CuGly:
+    value: 15.64
+    unit: dimensionless
+    meaning: log beta2 for Cu(2+) + 2 Gly- -> Cu(Gly)2
+    status: sourced
+    note: >-
+      Standard stability constant, 25 C, I = 0.1. At 0.27 M glycine and pH 10
+      the beta2 term dominates and free Cu(2+) is suppressed by about six
+      orders of magnitude, which is why eps_gly and not alpha_free is what
+      decides the answer.
+    source: "IUPAC stability constant compilations"
+
+# The three-vessel process.
+sequential:
+  note: >-
+    Stage 1 grows cells and harvests TetH. Stage 2 mixes purified TetH with
+    tetrathionate broth. Stage 3 charges the product liquor onto crushed PCB.
+    Only Stage 2 and Stage 3 have differential equations. Stage 1 is an
+    algebraic steady state.
+  E_stage2:
+    value: 0.043
+    unit: umol/L
+    meaning: Purified TetH charged into the conversion vessel
+    status: design_choice
+    note: >-
+      A FREE DESIGN VARIABLE, which is the whole point of purifying. It is set
+      by how much culture you are willing to grow, not by cell density.
+      0.043 gives 95.9 % conversion in 3 days and needs 9.1 L of culture per
+      litre of vessel. 0.129 finishes in 1 day and needs 27 L. The in-situ
+      value 4.75e-3 would take about 27 days.
+      This is why the Vmax disagreement between this repository and Part I
+      does not reach the leach result: Stage 3 contains no enzyme, and Stage 2
+      is charged to whatever level is chosen. See ISSUES.md item 35.
+    source: "docs/source/sequential_2026-08-12/, Stage 2"
+  E_stage3:
+    value: 0.043
+    unit: umol/L
+    meaning: Enzyme in the leach vessel, only if deliberately carried over
+    status: design_choice
+    note: "Used only when carry_enzyme is true."
+    source: "docs/source/sequential_2026-08-12/, Stage 3"
+  carry_enzyme:
+    value: false
+    meaning: Whether enzyme is transferred with the liquor into Stage 3
+    status: operating_choice
+    note: >-
+      False by default: purified enzyme stays in the conversion vessel.
+      Setting it true recycles the dead-end tetrathionate that the parasitic
+      reaction makes, and raises gold recovery at 72 h from 28.5 % to 33.7 %,
+      leaving 276 umol/L of thiosulfate unspent instead of none.
+      That is the largest single process gain in the model and it costs one
+      pipe. It also puts the enzyme back into the pH conflict of ISSUES.md
+      item 37. Not adopted; recorded for the team.
+    source: "docs/source/sequential_2026-08-12/, compare_carryover"
+  t_stage2:
+    value: 4320
+    unit: min
+    meaning: Conversion vessel duration, 3 days
+    status: operating_choice
+    source: "docs/source/sequential_2026-08-12/"
+  t_stage3:
+    value: 4320
+    unit: min
+    meaning: Leach vessel duration, 3 days
+    status: operating_choice
+    note: >-
+      The author recommends 1 day, not 3. Days two and three add 3.4
+      percentage points of gold. Value kept at 3 days so the model still
+      shows the plateau; see ISSUES.md item 21 for the missing stopping rule.
+    source: "docs/source/sequential_2026-08-12/"
+  purification_yield:
+    value: null
+    unit: dimensionless
+    meaning: Fraction of harvested TetH that survives extraction and purification
+    status: missing
+    note: >-
+      NOT MODELLED ANYWHERE. Stage 1 assumes every enzyme molecule in the
+      culture reaches the conversion vessel. Real purification recovers
+      perhaps 0.3 to 0.6. The quoted 9.1 L of culture per litre is therefore a
+      floor, not an estimate. ISSUES.md item 39.
+    source: null
+  enzyme_half_life_stage2:
+    value: null
+    unit: min
+    meaning: Thermal or chemical decay of purified TetH in the conversion vessel
+    status: missing
+    note: >-
+      NOT MODELLED. Stage 2 holds the enzyme concentration constant for 4320
+      minutes. k_deg was dropped along with the cells, but proteolysis is not
+      the only loss route. ISSUES.md item 39.
+    source: null
+
+# Proton balance. Alkalinity, never free [H+]. See the note.
+pH_balance:
+  form:
+    value: alkalinity
+    status: team_decision
+    note: >-
+      Adopted 2026-08-12. Tracking free [H+] fails here by construction: net
+      base production is about 1e5 umol/L over a run while the free proton
+      pool at pH 7 is 0.1 umol/L, so [H+] is driven negative and pH diverges.
+      The retired one-pot model also divided its proton rate by (1 + beta)
+      with beta in umol/L, which is dimensionally inconsistent. The sequential
+      model tracks alkalinity, which is the standard treatment and is correct.
+      Only the alkalinity form is implemented. ISSUES.md item 37.
+  beta:
+    value: 1.0e+5
+    unit: umol/L per pH unit
+    meaning: Lumped buffer capacity
+    status: calibrate
+    note: "About a 0.1 M carbonate buffer. Lower it and the pH swing grows."
+    source: null
+  pH0:
+    value: 7.0
+    unit: dimensionless
+    meaning: Starting pH of the leach liquor
+    status: operating_choice
+    note: >-
+      The leach chemistry in the sources is published at pH 9 to 10.5, not 7.
+      ISSUES.md item 23 is unaffected by this file and still open.
+    source: "docs/source/sequential_2026-08-12/, Stage 3"
+  pH_on:
+    value: false
+    meaning: Whether the proton balance is integrated
+    status: operating_choice
+    note: >-
+      False in Part I's model, which means the pH panel of his Figure 2 is a
+      flat line at 7.0 by construction and not a result. Switching it on gives
+      a final pH of 7.94 at beta = 1e5. Kept false so this repository
+      reproduces his figure; switch it on deliberately. ISSUES.md item 36.
+    source: "docs/source/sequential_2026-08-12/, Stage 3"
+  pH_control:
+    value: false
+    meaning: Whether a dosing pump holds pH at pH_set
+    status: operating_choice
+    note: >-
+      Added 2026-08-19. The team has a pH sensor and a dosing pump, so pH is
+      an INPUT to the real vessel, not an output. With this true, pH is held
+      at pH_set, the alkalinity state stops moving, and the model reports
+      TITRANT DEMAND instead: how much net base or acid the pump must deliver
+      to hold the set point. That is the quantity the equipment actually
+      produces, and the quantity a reagent budget needs.
+      FALSE by default, so nothing already reported moves.
+      It also removes a dependence on beta, which carries status calibrate and
+      no source. With the pump on, the buffer capacity does not enter.
+    source: "team equipment, 2026-08-19"
+  pH_set:
+    value: null
+    unit: dimensionless
+    meaning: The pH the dosing pump holds
+    status: operating_choice
+    note: >-
+      HELD NULL because the set point is not chosen. Choosing it is the call,
+      and the model raises rather than pick one.
+      THE WINDOW IS 9.3 TO 10.5, and the recommendation is 10.0 to 10.3.
+      Floor 9.3: below it thiosulfate decomposes and Gly- is under a quarter
+      dissociated.
+      Ceiling 10.5, for three separate reasons, none of them gold:
+        1. the tetrathionate return leg makes 2 trithionate per 5 thiosulfate,
+           so faster recycling also means faster permanent sulfur loss
+        2. the Gly- fraction flattens, 0.77 at 10.3 against 0.94 at 11.0
+        3. Cu(OH)2 precipitates above about 10.5 and passivates the particles
+      Gold dissolution is reported FLAT over pH 9 to 11, so none of the pH
+      argument is about gold. pH is chosen for lixiviant survival.
+      Not yet checked: what pH the GolB capture stage tolerates. If it needs
+      below 9 the two stages conflict. ISSUES.md item 23.
+    source: null
+
+# Numerical settings. Not chemistry. Kept here rather than as literals in
+# src/leach.py, because AGENTS.md rule 2 admits no number into a .py file.
+numerics:
+  exhaustion_smoothing_fraction:
+    value: 1.0e-4
+    unit: dimensionless
+    meaning: >-
+      Width of the smooth 0-to-1 switch at metal exhaustion, as a fraction of
+      the initial inventory. Replaces a hard if-statement that stalls a stiff
+      solver.
+    status: numerical_choice
+    note: >-
+      Taken from Part I's smooth_step. With this in place the terminal-event
+      workaround in simulate() is no longer needed for the sequential path.
+    source: "docs/source/sequential_2026-08-12/, smooth_step"
+
+
+# ---------------------------------------------------------------------------
+# THE TWO LIGAND SCENARIOS
+#
+# v5 presents Stage 3 twice, "WITH AMMONIA [266 mM]" and "WITHOUT AMMONIA
+# [0 mM]". That comparison answers the wrong question for this project: nobody
+# proposed running with no ligand at all. Copper destroys 98 % of the charge
+# either way, so "without ammonia" is not an option, it is the failure mode.
+#
+# The decision actually in front of the team is WHICH LIGAND. So the same two
+# sections are kept, and the second one is glycine rather than nothing.
+#
+# BOTH RUN AT THE SAME OPERATING POINT. Same pH, same aeration, same crush,
+# same batch time. Every difference between the two columns is the ligand and
+# nothing else, which is the only way a comparison is worth printing.
+#
+# THE COMPARISON IS DELIBERATELY GENEROUS TO AMMONIA, in three ways:
+#
+#   1. Ammonia is volatile and the air pump strips it. Above pH 9.25 ammonia
+#      is mostly free NH3, and sparging air through alkaline ammoniacal liquor
+#      is the standard method for driving ammonia out of water. The ammonia
+#      column assumes NONE of that happens, because no stripping rate has been
+#      measured for this vessel. Its numbers are an upper bound.
+#   2. Ammonia keeps its own measured constants, k_Au_Cu = 1500 and
+#      k_par = 1.0e-5, which are the best-characterised numbers in Part I.
+#      Glycine's decisive constant is not measured at all.
+#   3. k_ox_Cu is ammoniacal in BOTH columns, because no ammonia-free value
+#      exists. Ammonia slows Cu(I) re-oxidation, so the true ammonia-free
+#      value is probably larger, which would mean more Cu(II) and a LARGER
+#      benefit from glycine. The bias runs against glycine, not for it.
+#
+# If glycine still wins under all three handicaps, the conclusion is safe.
+#
+# `src/leach.py::scenario` reads this block.
+# ---------------------------------------------------------------------------
+scenarios:
+  meta:
+    operating_point:
+      note: >-
+        Applied to both columns before the ligand overrides below. pH held by
+        the dosing pump at the recommended set point; oxygen supplied by the
+        air pump rather than imposed; the alkaline return leg open, which is
+        the only thing that makes pH a lever at all.
+      values:
+        pH_control: true
+        pH_set: 10.0
+        alkaline_decay_on: true
+        O2_dynamic: true
+  ammonia:
+    label: "Ammonia, 266 mM"
+    status: reference_only
+    note: >-
+      NOT THE TEAM'S CHOICE. Retained so the comparison has a baseline and so
+      v5's ammoniacal section stays reproducible. Ammonia holds Cu(II) as the
+      cupric-tetraammine complex, which is a strong enough oxidant to make the
+      Cu(II) route carry gold, hence k_Au_Cu = 1500. It cannot be deployed at
+      Agbogbloshie, it needs fume control, and the air pump would remove it.
+    overrides:
+      k_Au_Cu: 1500
+      k_par: 1.0e-5
+      gly_on: false
+    source: "[11] Aylmore & Muir 2001; [12] Maharaj 2024; [6] Byerley 1973"
+  glycine:
+    label: "Glycine, 0.27 M"
+    status: team_choice
+    note: >-
+      ADOPTED 2026-08-19. ISSUES.md item 54. Glycine holds Cu(II) as copper
+      glycinate. The complex still oxidises gold, while free Cu(2+), the
+      species that attacks thiosulfate, is suppressed to about 8e-15 of the
+      pool at pH 10. That asymmetry is the whole mechanism.
+      Non-volatile, so the air pump cannot remove it and pH and airflow stay
+      independent knobs. Food grade and biodegradable.
+    overrides:
+      k_Au_Cu: 21.0
+      k_par: 1.20e-5
+      gly_on: true
+      G_T: 2.7e+5
+    eps_gly_band:
+      value: [0.0024, 0.0116, 0.0421]
+      status: calibrated_against_a_published_consequence
+      note: >-
+        NOT A MEASUREMENT, AND NOT ONE NUMBER. eps_gly is unmeasured. What is
+        published is its consequence: thiosulfate consumption falls from 5.2 to
+        2.2 g/L when glycine is added, a 58 % reduction. Calibrating against
+        that observable, and never against gold, gives 0.0116. Re-calibrating
+        under five different operating conditions gives 0.0024 to 0.0421, a
+        17x spread.
+        THE SCENARIO THEREFORE REPORTS A BAND, low / mid / high, and every
+        gold figure in it is a PREDICTION, because gold was not used in the
+        calibration. Quote the band. Never quote the midpoint alone.
+        ligand.eps_gly itself stays null, so a run that forgets to choose from
+        this band raises rather than picking one.
+      source: "calibrated 2026-08-19 against the 5.2 -> 2.2 g/L observable"
+    source: "ISSUES.md item 54"
+
+# ---------------------------------------------------------------------------
+# REPRODUCING THE 2026-08-12 SOURCE DOCUMENT
+#
+# Three constants changed on 2026-08-19 when the team chose glycine over
+# ammonia (ISSUES.md item 54). The write-up in
+# docs/source/sequential_2026-08-12/ still prints the ammoniacal numbers, and
+# it is a source document, so it is never edited. This block holds the values
+# that reproduce it, so the reproduction survives every later change.
+#
+# `src/leach.py::source_2026_08_12_overrides` reads it.
+# `tests/test_leach.py::test_sequential_reproduces_the_numbers_part_I_reports`
+# is the test that would otherwise have had to be weakened.
+#
+# DO NOT use these for a prediction. They describe an ammoniacal reactor.
+# ---------------------------------------------------------------------------
+reproduction_2026_08_12:
+  k_Au_Cu:
+    value: 1500
+    unit: umol.m^-2.min^-1
+    meaning: Gold rate constant, Cu(II) route, ammoniacal
+    status: retired_reproduction_only
+    source: "[11] Aylmore & Muir 2001; [12] Maharaj 2024"
+  k_par:
+    value: 1.0e-5
+    unit: L.umol^-1.min^-1
+    meaning: Parasitic rate constant, ammoniacal
+    status: retired_reproduction_only
+    source: "[6] Byerley 1973; [7] Breuer & Jeffrey 2003"
+  K_S2O3:
+    value: 3900
+    unit: umol/L
+    meaning: Thiosulfate half-saturation, reciprocal-band midpoint
+    status: retired_reproduction_only
+    source: "[18] Senanayake 2005"

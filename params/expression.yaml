@@ -16,11 +16,40 @@ alpha:
   source: "Typical E. coli promoter output (BioNumbers)"
 
 N:
-  value: 20
+  value: 300
   unit: copies/cell
   meaning: Plasmid copy number
-  status: sourced
-  source: "Medium-copy backbone, pBR322-like (approx 15-20)"
+  status: sourced_from_an_inconsistent_literature
+  range: [75, 700]
+  note: >-
+    CHANGED 2026-08-19 from 20 to 300. The wet lab confirms a pUC-type
+    high-copy backbone, not the pBR322-like one this file assumed.
+    THE LITERATURE IS GENUINELY INCONSISTENT. 300-700 and 500-700 are both
+    widely quoted, while NEB's own pUC19 datasheet gives about 75 at 37 C.
+    300 is a mid-range choice and 75-700 is carried as the honest band.
+    SATURATION MAKES THE BAND MATTER LESS THAN IT LOOKS. Because the anchor
+    capacity is now co-limiting, a 9.3x spread in N compresses to 3.7x in the
+    answer: A = 8,955 at N = 75, 23,301 at 300, 33,533 at 700, and 49,983 at
+    infinite copy number. The hard ceiling is f*P_s_max = 50,000 sites, which
+    no copy number can pass.
+    THIS IS THE CHANGE THAT BROKE THE LINEAR CLOSED FORM. At N = 300 the
+    non-saturating form overpredicts surface protein by 87 %; beyond N = 350
+    it predicts more protein than the membrane holds. See
+    src/expression.py::steady_state_linear.
+    VECTOR NAMED 2026-08-20: pJUMP24-1A(sfGFP), for the GolB construct and the
+    TetH construct both. pJUMP24 is SEVA AbR #2, kanamycin, with OriV #4,
+    pRO1600/ColE1, a pUC-derived module Addgene classifies as high copy, so
+    the high-copy classification this value rests on is the right one, and
+    TetH shares the plasmid rather than assuming it.
+    IT IS A CLASS, NOT A COUNT. Neither Addgene nor the JUMP paper gives
+    copies per cell for OriV #4, and this strain has not been measured, so
+    300 stays a mid-range choice inside the 75 to 700 band. ISSUES.md item 67.
+  superseded:
+    value: 20
+    reason: >-
+      pBR322-like medium-copy assumption, correct until the backbone was
+      confirmed. Retired 2026-08-19.
+  source: "pJUMP24-1A(sfGFP), OriV #4 pRO1600/ColE1, high copy per Addgene #126971; band from NEB pUC19 datasheet and the autodisplay literature"
 
 delta_m:
   value: 0.20
@@ -78,17 +107,29 @@ P_s_max:
   status: sourced
   source: "Autodisplay reaches >10^5 molecules/cell (Jose & Meyer)"
 
-K_d:
+K_Au:
   value: 10
   unit: uM
   meaning: GolB-Au(I) dissociation constant
   status: placeholder
-  source: "Placeholder -- no clean experimental K_d; source or fit"
+  source: "Placeholder -- no clean experimental K_Au; source or fit"
   conflict: "Part III params table lists K_D = 0.1 uM (conservative), sweep 1e-4-0.1. See ISSUES.md item 1."
 
 # Reported steady state from Part II section 5, for regression testing.
 reported_steady_state:
-  m: 45
-  P_c: 1460
-  P_s: 5500
-  A: 2900
+  m: 682
+  P_c: 21818
+  P_s: 46602
+  A: 23301
+  note: >-
+    Draft 4 of the display document, 2026-08-19, Table 3, at N = 300. All four
+    are quoted from the SATURATING closed form, which reproduces the ODE
+    exactly, so the two routes no longer disagree. ISSUES.md item 61.
+  superseded_2026_08_19:
+    m: 45
+    P_c: 1460
+    P_s: 5500
+    A: 2900
+    reason: >-
+      The earlier draft at N = 20. Its P_s came from the ODE and its A from
+      the non-saturating closed form, which is the 5.5% gap of item 3.
