@@ -19,3 +19,42 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: '-15% 0px -65% 0px', threshold: [0, 0.1, 0.5] });
 
 sections.forEach((section) => observer.observe(section));
+
+const resultNodes = [...document.querySelectorAll('[data-result]')];
+
+const readPath = (source, path) => path
+  .split('.')
+  .reduce((value, key) => value?.[key], source);
+
+const formatResult = (value, node) => {
+  const digits = Number(node.dataset.digits ?? 2);
+  const scaled = node.dataset.format === 'percent' ? value * 100 : value;
+  return new Intl.NumberFormat('en-GB', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits
+  }).format(scaled) + (node.dataset.format === 'percent' ? '%' : '');
+};
+
+if (resultNodes.length) {
+  fetch('../docs/media/recovery_model/results.json')
+    .then((response) => {
+      if (!response.ok) throw new Error(`Recovery results unavailable (${response.status})`);
+      return response.json();
+    })
+    .then((results) => {
+      resultNodes.forEach((node) => {
+        const value = readPath(results, node.dataset.result);
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          node.textContent = 'Unavailable';
+          return;
+        }
+        node.textContent = formatResult(value, node);
+      });
+    })
+    .catch(() => {
+      resultNodes.forEach((node) => {
+        node.textContent = 'Result unavailable';
+        node.classList.add('result-unavailable');
+      });
+    });
+}

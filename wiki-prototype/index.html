@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="An evolving model of biological gold recovery from electronic waste.">
   <title>Recovering Gold from E-waste</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=5">
   <script>
     window.MathJax = {
       tex: {
@@ -16,7 +16,7 @@
     };
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-  <script src="script.js" defer></script>
+  <script src="script.js?v=2" defer></script>
 </head>
 <body>
   <aside class="sidebar" aria-label="Page contents">
@@ -45,6 +45,18 @@
       <a class="nav-link" href="#leach-to-capture">
         <span aria-hidden="true">04</span>
         Leach-to-capture handover
+      </a>
+      <a class="nav-link" href="#capturing-gold">
+        <span aria-hidden="true">05</span>
+        Capturing the gold
+      </a>
+      <a class="nav-link" href="#releasing-gold">
+        <span aria-hidden="true">06</span>
+        Releasing the gold
+      </a>
+      <a class="nav-link" href="#forming-metal">
+        <span aria-hidden="true">07</span>
+        Returning gold to metal
       </a>
     </nav>
 
@@ -461,13 +473,12 @@
         <p class="body-copy flush-copy">Gold can be oxidised directly by oxygen or by Cu(II). Copper metal also dissolves from the board as Cu(I), which oxygen converts back to Cu(II). That regenerated Cu(II) can support gold dissolution, but it also converts thiosulfate into tetrathionate. The ammoniacal process slows this competing loss by binding Cu(II).</p>
 
         <figure class="pathway-figure">
-          <picture>
-            <source media="(max-width: 760px)" srcset="../docs/media/wiki/concepts/leaching-competing-pathways-v2-mobile.svg?v=8">
-            <img src="../docs/media/wiki/concepts/leaching-competing-pathways-v2.svg?v=8" alt="A timed animation of one ammonia-free leaching run. Thiosulfate markers leave the vessel. Oxygen oxidises the gold and a trace of the leachant leaves as the gold thiosulfate complex. Nearly all of it is converted to tetrathionate by Cu(II). The copper is not fed in: it comes off the board as Cu(0), dissolves as Cu(I), and oxygen re-oxidises that to Cu(II), which the reaction hands straight back as Cu(I). When the last marker is spent the routes grey out and the run halts with gold still on the remaining board fragments.">
-          </picture>
+          <object class="pathway-wide" type="image/svg+xml" data="../docs/media/wiki/concepts/leaching-budget.svg?v=1">
+            <img src="../docs/media/wiki/concepts/leaching-budget.svg?v=1" alt="Inside the leaching vessel, thiosulfate is a fixed charge. Oxygen from a controlled supply above the vessel helps thiosulfate dissolve gold from crushed circuit board, which carries far more copper than gold. Copper leaves the board as copper(I); oxygen re-oxidises it to copper(II), which converts thiosulfate into tetrathionate and returns to copper(I). The copper is regenerated on every turn and the thiosulfate is not, so the leachant runs out while gold is still on the board.">
+          </object>
           <figcaption>
-            <strong>One leaching run, start to exhaustion</strong>
-            <span>Oxygen oxidises the gold, and only a trace of the leachant leaves that way. Nearly all of it is converted to tetrathionate by Cu(II). Copper is not added: it comes off the board as Cu(0) and dissolves as Cu(I), and oxygen is the only thing that makes Cu(II). The parasitic step spends the Cu(II) and returns Cu(I), so oxygen keeps the loop turning until the budget is gone. The run halts when the thiosulfate is spent, not when the gold is gone, so gold stays on the remaining board fragments. The bar tracks the cycle and its restart.</span>
+            <strong>Thiosulfate is a finite reaction budget</strong>
+            <span>A controlled oxygen supply above the vessel helps thiosulfate dissolve gold, and that pathway takes only a small share of the charge. Copper is not added: it leaves the board as Cu(I), and the same oxygen re-oxidises it to Cu(II), which converts thiosulfate into tetrathionate and returns to Cu(I). The copper comes back on every turn and the thiosulfate does not, so the leachant is exhausted while gold is still on the board. The loop runs for twelve seconds; click it to start it again.</span>
           </figcaption>
         </figure>
       </section>
@@ -708,6 +719,335 @@
         </div>
         <p class="stream-source">Interface definition: <a href="../src/interfaces.py">leach-to-capture handover</a> · evidence status: model prediction until leachate measurements are appended.</p>
       </section>
+    </section>
+
+    <section class="model-section recovery-section capture-section" id="capturing-gold" aria-labelledby="capturing-gold-title">
+      <div class="section-heading">
+        <span class="section-number">04</span>
+        <div>
+          <p class="section-kicker">Overview stage three</p>
+          <h2 id="capturing-gold-title">Capturing the gold</h2>
+        </div>
+      </div>
+
+      <p class="stage-question">Can GolB-displaying cells capture enough dissolved gold from the leachate to supply the rest of the recovery process?</p>
+
+      <div class="recovery-opening">
+        <div>
+          <span class="evidence prediction">Conditional simulation</span>
+          <h3>The current reference is limited by the number of modelled sites</h3>
+          <p>The capture calculation joins the dissolved-gold feed from leaching to the binding-site inventory supplied by the GolB expression model. It solves binding and gold conservation together, so the cells can never bind more gold than entered the vessel or more than the represented sites can hold.</p>
+          <p>At the current reference point, those sites are almost occupied. Improving affinity alone cannot lift that inventory ceiling. The useful next question is whether real whole cells bind more gold than the single-site calculation represents, and whether those sites remain functional in the sulfur-rich leachate.</p>
+        </div>
+        <aside class="finding-card capture-finding">
+          <span>Reference capture</span>
+          <strong data-result="reference.eta_capture" data-format="percent" data-digits="2">Loading…</strong>
+          <p>of incoming gold, using the conditional single-occupancy site model.</p>
+        </aside>
+      </div>
+
+      <div class="recovery-ledger" aria-label="Reference capture material balance">
+        <article>
+          <span>Gold entering capture</span>
+          <strong><span data-result="reference.feed_uM" data-format="number" data-digits="1">Loading…</span> µM</strong>
+          <small>supplied by the leaching model</small>
+        </article>
+        <i aria-hidden="true"></i>
+        <article>
+          <span>Gold bound to cells</span>
+          <strong><span data-result="reference.bound_uM" data-format="number" data-digits="3">Loading…</span> µM</strong>
+          <small>equilibrium site calculation</small>
+        </article>
+        <i aria-hidden="true"></i>
+        <article>
+          <span>Leaves with loaded cells</span>
+          <strong>Bound Au(I)</strong>
+          <small>the starting amount for elution</small>
+        </article>
+      </div>
+
+      <figure class="model-figure recovery-figure">
+        <img src="../docs/media/recovery_model/capture_capacity_investigation.png" alt="Comparison of capture predicted from the expression-derived site inventory and labelled literature whole-cell capacity scenarios across gold feed concentrations.">
+        <figcaption>
+          <strong>The site count is a scenario, not a measured whole-cell ceiling</strong>
+          <span>The expression-derived model and literature whole-cell capacities describe different evidence categories. None of the literature scenarios is adopted for this process; the project-matrix capacity remains unmeasured.</span>
+        </figcaption>
+      </figure>
+
+      <div class="recovery-explainer-grid">
+        <article>
+          <span class="section-kicker">In plain language</span>
+          <h3>Count gold and sites in the same balance</h3>
+          <p>The binding equation uses free gold, not all gold added. As gold binds, the free concentration falls. Solving that feedback prevents impossible predictions and makes the capacity limit visible.</p>
+        </article>
+        <article>
+          <span class="section-kicker">What changes the project</span>
+          <h3>Measure capacity before optimising speed</h3>
+          <p>Compare GolB-displaying cells, unmodified cells and a cell-free blank in representative leachate. Measure both dissolved and cell-associated gold so binding can be separated from background adsorption or loss.</p>
+        </article>
+      </div>
+
+      <div class="technical-stack recovery-details" aria-label="Expandable capture model details">
+        <details>
+          <summary><span><small>Core model</small>Binding with gold conservation</span><span class="details-action">View equation</span></summary>
+          <div class="details-content">
+            <p>Let total gold concentration be (A_T), free gold be (A_T-C), bound gold be (C), available site concentration be (S), and the apparent dissociation constant be (K_d).</p>
+            <div class="math-display">\[C=\frac{S(A_T-C)}{K_d+A_T-C}\]</div>
+            <p>The implementation uses the stable positive solution of this mass-balance equation. Capture is an equilibrium calculation; it does not yet predict contact time, transport resistance or damage to sites.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Evidence boundary</small>What the site inventory does not prove</span><span class="details-action">View limitations</span></summary>
+          <div class="details-content assumption-groups">
+            <div>
+              <h4>Verified internally</h4>
+              <ul>
+                <li>Bound gold never exceeds the gold feed.</li>
+                <li>Bound gold never exceeds the represented site inventory.</li>
+                <li>The expression-to-capture joint is recomputed rather than copied.</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Still needs measurement</h4>
+              <ul>
+                <li>Functional whole-cell capacity in the project leachate.</li>
+                <li>Background adsorption by unmodified cells.</li>
+                <li>GolB activity after exposure to tetrathionate and other sulfur species.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Evidence ledger</small>Capture inputs and provenance</span><span class="details-action">View table</span></summary>
+          <div class="details-content table-wrap">
+            <table class="parameter-table">
+              <thead><tr><th>Input</th><th>Role</th><th>Evidence status</th><th>Source of truth</th></tr></thead>
+              <tbody>
+                <tr><td>(A_T)</td><td>Total dissolved gold entering capture</td><td><span class="evidence prediction">Model handover</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>(S)</td><td>Single-occupancy site inventory</td><td><span class="evidence derived">Derived upstream</span></td><td><a href="../src/interfaces.py">Expression interface</a></td></tr>
+                <tr><td>(K_d)</td><td>Apparent GolB-gold affinity</td><td><span class="evidence proxy">Unmeasured proxy</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>Whole-cell capacity</td><td>Empirical capacity in the real matrix</td><td><span class="evidence needed">Unmeasured</span></td><td><a href="../docs/CAPTURE_INVESTIGATION.md">Capture investigation</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+
+      <section class="recovery-handover" aria-labelledby="capture-elution-title">
+        <div>
+          <p class="section-kicker">Handover to stage four</p>
+          <h3 id="capture-elution-title">Loaded cells move forward; unbound gold does not</h3>
+          <p>The captured amount, not the original feed and not the total site inventory, becomes the initial gold available for release. The model keeps the much larger uncaptured amount in the ledger.</p>
+        </div>
+        <div class="handover-token"><span>Passed forward</span><strong>(n_{captured})</strong><small>gold bound to GolB-displaying cells</small></div>
+      </section>
+    </section>
+
+    <section class="model-section recovery-section elution-section" id="releasing-gold" aria-labelledby="releasing-gold-title">
+      <div class="section-heading">
+        <span class="section-number">05</span>
+        <div>
+          <p class="section-kicker">Overview stage four</p>
+          <h2 id="releasing-gold-title">Releasing the gold</h2>
+        </div>
+      </div>
+
+      <p class="stage-question">How much captured gold can a thiourea wash release, and when does a longer wash stop being useful?</p>
+
+      <div class="recovery-opening">
+        <div>
+          <span class="evidence proxy">Empirical scenario</span>
+          <h3>Wash speed and the final release ceiling are different questions</h3>
+          <p>The elution model separates the rate of approach from the fraction that remains bound. A longer wash can move the system closer to its assumed ceiling, but it cannot change that ceiling. This keeps a faster wash from being mistaken for a more complete one.</p>
+          <p>The present curve is a literature-motivated hypothesis. It has not been fitted to GolB cells at the intended loading, and the selected eluate must also remain compatible with the reduction chemistry that follows.</p>
+        </div>
+        <aside class="finding-card elution-finding">
+          <span>Reference wash transfer</span>
+          <strong data-result="reference.eta_elute" data-format="percent" data-digits="1">Loading…</strong>
+          <p>of captured gold reaches the eluate in the current six-hour scenario.</p>
+        </aside>
+      </div>
+
+      <figure class="model-figure recovery-figure">
+        <img src="../docs/media/recovery_model/fig5_elution_tradeoff.png" alt="Elution fraction and the additional fraction released per hour across wash time for the current empirical scenario.">
+        <figcaption>
+          <strong>Additional wash time gives a diminishing return</strong>
+          <span>The curve distinguishes the assumed release ceiling from the time needed to approach it. It is a scenario to test, not evidence of a molecular mechanism.</span>
+        </figcaption>
+      </figure>
+
+      <div class="recovery-explainer-grid">
+        <article>
+          <span class="section-kicker">In plain language</span>
+          <h3>The wash approaches a ceiling</h3>
+          <p>Early in the wash, time releases gold quickly. Later, each extra hour contributes less. Gold assigned to the non-elutable fraction remains with the cells unless the chemistry itself changes.</p>
+        </article>
+        <article>
+          <span class="section-kicker">What changes the project</span>
+          <h3>Fit the endpoint and the rate separately</h3>
+          <p>Measure gold in the wash and gold remaining on the cells across time. Compare candidate curve shapes at the intended loading, then test whether the resulting eluate can enter reduction without inhibition.</p>
+        </article>
+      </div>
+
+      <div class="technical-stack recovery-details" aria-label="Expandable elution model details">
+        <details>
+          <summary><span><small>Core model</small>Empirical release curve</span><span class="details-action">View equation</span></summary>
+          <div class="details-content">
+            <p>Let (f_r) be the fraction that remains non-elutable, (k_e) the apparent elution rate, and (t_e) the wash duration. The eluted fraction is</p>
+            <div class="math-display">\[\eta_e=(1-f_r)\frac{k_et_e}{1+k_et_e},\qquad n_e=n_c\eta_e\]</div>
+            <p>The coefficient is conditional on loading, material, wash chemistry and volume. It must be re-fitted if those conditions change.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Evidence boundary</small>What the wash model can establish</span><span class="details-action">View limitations</span></summary>
+          <div class="details-content assumption-groups">
+            <div>
+              <h4>Useful now</h4>
+              <ul>
+                <li>Tracks the actual captured amount into the wash.</li>
+                <li>Separates release speed from release completeness.</li>
+                <li>Supports explicit wash-volume accounting.</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Still needs measurement</h4>
+              <ul>
+                <li>Elution curve shape at the intended loading.</li>
+                <li>Final non-elutable fraction for the selected chemistry.</li>
+                <li>Compatibility of the eluate with reduction.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Evidence ledger</small>Release inputs and provenance</span><span class="details-action">View table</span></summary>
+          <div class="details-content table-wrap">
+            <table class="parameter-table">
+              <thead><tr><th>Input</th><th>Role</th><th>Evidence status</th><th>Source of truth</th></tr></thead>
+              <tbody>
+                <tr><td>(n_c)</td><td>Gold actually captured</td><td><span class="evidence prediction">Model handover</span></td><td><a href="../src/recovery_process.py">Process ledger</a></td></tr>
+                <tr><td>(f_r)</td><td>Fraction remaining bound</td><td><span class="evidence proxy">Literature transfer</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>(k_e)</td><td>Apparent approach rate</td><td><span class="evidence proxy">Provisional</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>Thiourea wash</td><td>Only documented eluent option</td><td><span class="evidence design">Operating scenario</span></td><td><a href="../docs/RECOVERY_MODEL.md">Technical model</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+
+      <section class="recovery-handover" aria-labelledby="elution-reduction-title">
+        <div>
+          <p class="section-kicker">Handover to stage five</p>
+          <h3 id="elution-reduction-title">The eluate carries gold concentration, volume and chemistry</h3>
+          <p>The reduction stage receives an amount of released gold and a liquid volume. Added lysate can dilute that gold; any concentration step or transfer loss must be represented explicitly rather than hidden in an efficiency.</p>
+        </div>
+        <div class="handover-token"><span>Passed forward</span><strong><span data-result="reference.eluate_uM" data-format="number" data-digits="3">Loading…</span> µM</strong><small>reference dissolved gold in the reduction feed</small></div>
+      </section>
+    </section>
+
+    <section class="model-section recovery-section metal-section" id="forming-metal" aria-labelledby="forming-metal-title">
+      <div class="section-heading">
+        <span class="section-number">06</span>
+        <div>
+          <p class="section-kicker">Overview stage five</p>
+          <h2 id="forming-metal-title">Returning gold to metal</h2>
+        </div>
+      </div>
+
+      <p class="stage-question">Can the released Au(I) form new metallic gold within the batch, with enough reducing capacity and sufficiently fast particle formation?</p>
+
+      <div class="recovery-opening">
+        <div>
+          <span class="evidence needed">Kinetics unvalidated</span>
+          <h3>The electron supply can be sufficient while reduction still nearly stalls</h3>
+          <p>The reduction model follows dissolved gold, newly formed metal, reduced and oxidised protein, and the recharge donor. It checks both gold and reducing-capacity balances. Those checks establish that the bookkeeping is consistent; they do not establish that the borrowed kinetic constants describe this Au(I)-thiourea system.</p>
+          <p>The reference proxy reaches essentially complete conversion, while the slow corner of the declared kinetic ranges produces very little metal in the same batch. Reduction therefore remains a feasibility question, not a solved polishing step.</p>
+        </div>
+        <aside class="finding-card metal-finding">
+          <span>Slow kinetic corner</span>
+          <strong data-result="slow_corner.eta_reduce" data-format="percent" data-digits="3">Loading…</strong>
+          <p>of the eluate becomes new metal after the reference batch duration.</p>
+        </aside>
+      </div>
+
+      <figure class="model-figure recovery-figure">
+        <img src="../docs/media/recovery_model/fig3_kinetic_range.png" alt="Simulated gold conversion across the full declared nucleation and growth rate ranges, with the reference proxy identified.">
+        <figcaption>
+          <strong>The declared kinetic range spans near-stall to complete conversion</strong>
+          <span>Colour represents a conditional simulation, not likelihood or confidence. The reference marker is a transferred proxy, not a fitted project measurement.</span>
+        </figcaption>
+      </figure>
+
+      <div class="recovery-explainer-grid">
+        <article>
+          <span class="section-kicker">In plain language</span>
+          <h3>Nucleation starts the process; metal accelerates it</h3>
+          <p>The model contains a slow route that creates the first metallic nuclei and a growth route that becomes stronger once metal exists. This can produce a delayed rise even when the electron inventory is adequate.</p>
+        </article>
+        <article>
+          <span class="section-kicker">What changes the project</span>
+          <h3>Measure metal formation in the actual eluate</h3>
+          <p>Run time courses with protein-free, donor-free and inactive-protein controls. Measure dissolved gold and independently identify metallic product so adsorption or optical changes are not counted as recovery.</p>
+        </article>
+      </div>
+
+      <div class="technical-stack recovery-details" aria-label="Expandable reduction model details">
+        <details>
+          <summary><span><small>Core model</small>Nucleation, growth and protein availability</span><span class="details-action">View equations</span></summary>
+          <div class="details-content">
+            <p>Let dissolved gold be (A), metallic gold be (B), and the fraction of reduced protein available be represented by (g_E). The effective formation rate is</p>
+            <div class="math-display">\[v=(k_n+k_gB)A\,g_E\]</div>
+            <p>The model also tracks protein recharge and oxidation. Seed metal is recorded separately and is never counted as newly formed product.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Conservation checks</small>Gold and reducing-capacity ledgers</span><span class="details-action">View equations</span></summary>
+          <div class="details-content">
+            <p>Every accepted trajectory conserves total gold and balances reduced protein, donor use, new metal and oxidation loss:</p>
+            <div class="math-stack">
+              <div class="math-display">\[A+B=A_0+B_{seed}\]</div>
+              <div class="math-display">\[E_r+\frac{D}{\rho}+\nu(B-B_{seed})+L=E_{r,0}+\frac{D_0}{\rho}\]</div>
+            </div>
+            <p>These are implementation checks. Experimental validation requires calibrated concentration measurements and independent product characterisation.</p>
+          </div>
+        </details>
+        <details>
+          <summary><span><small>Evidence ledger</small>Reduction inputs and provenance</span><span class="details-action">View table</span></summary>
+          <div class="details-content table-wrap">
+            <table class="parameter-table">
+              <thead><tr><th>Input</th><th>Role</th><th>Evidence status</th><th>Source of truth</th></tr></thead>
+              <tbody>
+                <tr><td>(k_n)</td><td>Effective nucleation rate</td><td><span class="evidence proxy">Cross-system proxy</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>(k_g)</td><td>Autocatalytic growth rate</td><td><span class="evidence proxy">Transferred chemistry</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>(E_T)</td><td>Redox-competent protein dose</td><td><span class="evidence design">Selected scenario</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+                <tr><td>(D_0)</td><td>Recharge donor inventory</td><td><span class="evidence design">Design choice</span></td><td><a href="../params/recovery_chain.yaml">Recovery parameters</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+
+      <section class="recovery-verdict" aria-labelledby="recovery-verdict-title">
+        <div class="verdict-copy">
+          <p class="section-kicker">Current end-to-end judgment</p>
+          <h3 id="recovery-verdict-title">The model follows gold to new metal, but does not yet prove a process yield</h3>
+          <p>Under the reference site inventory, wash scenario and reduction proxy, the model assigns <strong data-result="reference.eta_total" data-format="percent" data-digits="2">Loading…</strong> of feed gold to newly formed metal before physical collection. Most feed gold remains uncaptured. The reduction range can lower the metal amount further.</p>
+          <p>The next design should measure whole-cell capture in leachate, fit an elution time course, and determine reduction kinetics in the actual eluate before optimising scale.</p>
+        </div>
+        <div class="metal-output" aria-label="Reference model endpoint">
+          <span>Conditional new metal</span>
+          <strong><span data-result="reference.metal_umol_per_initial_L" data-format="number" data-digits="3">Loading…</span> µmol</strong>
+          <small>per initial litre, before collection</small>
+          <div class="gold-pellet" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <div class="recovery-links" aria-label="Recovery model resources">
+        <a href="../docs/RECOVERY_MODEL.md"><strong>Technical model</strong><span>Full equations and interpretation</span></a>
+        <a href="../docs/media/recovery_model/results.json"><strong>Generated results</strong><span>Machine-readable reference outputs</span></a>
+        <a href="../src/recovery_process.py"><strong>Process implementation</strong><span>Amounts, volumes and stage handovers</span></a>
+        <a href="../tests/test_recovery_process.py"><strong>Verification</strong><span>Gold, volume and interface checks</span></a>
+      </div>
     </section>
   </main>
 </body>
