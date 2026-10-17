@@ -1,0 +1,68 @@
+# ------------------------------------------------------------------ figure 2
+# Capture against time. dC/dt = k_on*A*(S0 - C) - k_off*C with A = Au_tot - C,
+# which is the binding equation of section 2 with X held at X_max.
+def bound(t_end, Au_tot, n=2000):
+    def rhs(_t, y):
+        c = y[0]
+        return [K_ON * (Au_tot - c) * (S0 - c) - K_OFF * c]
+    t = np.linspace(0.0, t_end, n)
+    sol = solve_ivp(rhs, (0.0, t_end), [0.0], t_eval=t,
+                    rtol=1e-9, atol=1e-12, method="LSODA")
+    return t, sol.y[0]
+
+fig, ax = plt.subplots(1, 2, figsize=(9.4, 3.6))
+feeds = [(AU_FEED, "C0", "29 uM fed, as the leach delivers"),
+         (1.0, "C1", "1 uM fed"),
+         (0.2, "C2", "0.2 uM fed, below the site pool")]
+
+a = ax[0]
+for Au_tot, colour, label in feeds:
+    t, c = bound(1.0, Au_tot)
+    a.plot(t * 60.0, c, lw=2, color=colour, label=label)
+    ceq = float(recovery_chain.capture_equilibrium(Au_tot, S0, K_AU))
+
+    def reached(frac):
+        """Minutes to a share of equilibrium, or None inside the hour drawn.
+
+        np.argmax returns 0 when nothing satisfies the test, which reads as
+        "instant" rather than "never". The low feeds do not get there.
+        """
+        hit = np.flatnonzero(c >= frac * ceq)
+        return t[hit[0]] * 60.0 if hit.size else None
+
+    def fmt(x):
+        return "over 60" if x is None else "%.2f" % x
+
+    print("Au_tot %6.1f uM: C_eq %.4f uM, half of it at %s min, "
+          "99 %% at %s min" % (Au_tot, ceq, fmt(reached(0.5)),
+                               fmt(reached(0.99))))
+a.axhline(S0, ls="--", lw=1, color="C3")
+a.annotate("$S_0$ = %.3f uM, every site" % S0, xy=(30, S0), xytext=(16, S0 * 0.80),
+           fontsize=8, color="C3")
+a.set(xlabel="time (min)", ylabel="gold on the cells, $C$ (uM)",
+      title="(a) binding is over in minutes", xlim=(0, 60))
+a.legend(loc="lower right", fontsize=8)
+
+t, c = bound(1.0, AU_FEED)
+ceq = float(recovery_chain.capture_equilibrium(AU_FEED, S0, K_AU))
+b = ax[1]
+b.plot(t * 60.0, 100.0 * c / ceq, lw=2, color="C0")
+b.axhline(100, ls="--", lw=1, color="0.6")
+for frac, note in ((50, "half"), (99, "99 %")):
+    when = t[np.argmax(c >= frac / 100.0 * ceq)] * 60.0
+    b.plot([when], [frac], "o", color="k", ms=4, zorder=5)
+    # past the middle of the axis the label has to go left, or it falls off
+    left = when > 5.0
+    b.annotate("%s of equilibrium\nat %.1f min" % (note, when),
+               xy=(when, frac),
+               xytext=(when - 5.2 if left else when + 1.6, frac - 22),
+               fontsize=8, arrowprops=dict(arrowstyle="->", lw=0.8))
+b.annotate("the batch is limited by capacity, not by contact time:\n"
+           "holding the vessel longer binds nothing more",
+           xy=(6, 30), xytext=(2.2, 12), fontsize=8)
+b.set(xlabel="time (min)", ylabel="share of equilibrium reached (%)",
+      title="(b) the 29 uM feed, normalised", xlim=(0, 10), ylim=(0, 110))
+fig.tight_layout()
+save(fig, "figR2_capture_time.png")
+
+print("\nall recovery figures written to", OUT)

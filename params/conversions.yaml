@@ -16,11 +16,28 @@ N_A:
   source: "SI definition"
 
 cells_per_g_dry_weight:
-  value: 3.57e+12
+  value: 2.36e+12
   unit: cells/g
   meaning: E. coli cells per gram dry weight
   status: sourced
-  source: "BioNumbers: E. coli single-cell dry mass approx 0.28 pg; 1/0.28e-12 = 3.57e12"
+  source: "[S30] Dennis & Bremer via BioNumbers; interpolated at our own mu"
+  derivation: >-
+    Dry mass per cell varies more than 5-fold with growth rate: 148 fg at a
+    100 min doubling time, 865 fg at 24 min [S30]. Faster cells are bigger.
+    Interpolating log-linearly in growth rate at our mu = 1.2 /h, a 34.7 min
+    doubling, gives 423 fg per cell and 1/423e-15 = 2.36e12 cells/g.
+  corrected_2026_08_11: true
+  superseded:
+    value: 3.57e+12
+    basis: "single-cell dry mass 0.28 pg = 280 fg"
+    reason: >-
+      280 fg is a SLOW-GROWTH value, near the 148 fg end of the range. Applying
+      it to a culture the model runs at a 35 min doubling overstated q_max and
+      Vmax by 1.51x. Found by the source audit, ISSUES.md item 33.
+  caveat: >-
+    Still an interpolation from a literature curve, not a measurement of our
+    own culture. One OD600 curve plus one dry-weight measurement removes this
+    constant entirely, and that is the recommended fix.
   note: >
     Sensitive to growth rate. Cell dry mass ranges roughly 0.2-0.5 pg across
     growth conditions, so this constant alone carries a factor of about 2.5.

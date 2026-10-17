@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Gold recovery process overview</title>
+  <desc id="description">A five-stage path from biological thiosulfate production and PCB leaching through GolB capture, thiourea release, and reduction to metallic gold.</desc>
+
+  <defs>
+    <marker id="arrowhead" markerUnits="userSpaceOnUse" markerWidth="26" markerHeight="26" refX="20" refY="13" orient="auto">
+      <path d="M2 2 L22 13 L2 24 Z" fill="#858581"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" fill="#f1f1ef"/>
+
+  <g fill="#252523" font-family="Inter, Arial, sans-serif">
+    <g transform="translate(76 56)">
+      <text x="0" y="0" dominant-baseline="hanging" fill="#67aeb1" font-size="16" font-weight="700" letter-spacing="1.5">01</text>
+      <text x="38" y="0" dominant-baseline="hanging" font-size="27" font-weight="600">Make thiosulfate</text>
+      <image x="0" y="52" width="420" height="300" preserveAspectRatio="xMidYMid meet" href="overview-stage-01-leachant-web.png"/>
+    </g>
+
+    <g transform="translate(584 56)">
+      <text x="0" y="0" dominant-baseline="hanging" fill="#6e9f72" font-size="16" font-weight="700" letter-spacing="1.5">02</text>
+      <text x="38" y="0" dominant-baseline="hanging" font-size="27" font-weight="600">Leach crushed PCB</text>
+      <image x="0" y="52" width="420" height="300" preserveAspectRatio="xMidYMid meet" href="overview-stage-02-leaching-web.png"/>
+    </g>
+
+    <g transform="translate(1092 284)">
+      <text x="0" y="0" dominant-baseline="hanging" fill="#b18222" font-size="16" font-weight="700" letter-spacing="1.5">03</text>
+      <text x="38" y="0" dominant-baseline="hanging" font-size="27" font-weight="600">Capture dissolved gold</text>
+      <image x="0" y="52" width="420" height="300" preserveAspectRatio="xMidYMid meet" href="overview-stage-03-golb-capture-web.png"/>
+    </g>
+
+    <g transform="translate(663 552)">
+      <text x="0" y="0" dominant-baseline="hanging" fill="#9878b1" font-size="16" font-weight="700" letter-spacing="1.5">04</text>
+      <text x="38" y="0" dominant-baseline="hanging" font-size="27" font-weight="600">Release gold with thiourea</text>
+      <image x="0" y="52" width="420" height="270" preserveAspectRatio="xMidYMid meet" href="overview-stage-04-thiourea-release-web.png"/>
+    </g>
+
+    <g transform="translate(116 552)">
+      <text x="0" y="0" dominant-baseline="hanging" fill="#99772e" font-size="16" font-weight="700" letter-spacing="1.5">05</text>
+      <text x="38" y="0" dominant-baseline="hanging" font-size="27" font-weight="600">Return gold to metal</text>
+      <image x="0" y="52" width="420" height="270" preserveAspectRatio="xMidYMid meet" href="overview-stage-05-metallic-gold-web.png"/>
+    </g>
+  </g>
+
+  <g fill="none" stroke="#858581" stroke-width="7" stroke-linecap="round" marker-end="url(#arrowhead)">
+    <path d="M460 238 C510 220 535 220 574 232"/>
+    <path d="M992 240 C1040 248 1062 272 1070 306"/>
+    <path d="M1320 610 C1285 696 1195 721 1092 706"/>
+    <path d="M650 711 C610 721 576 721 543 711"/>
+  </g>
+</svg>

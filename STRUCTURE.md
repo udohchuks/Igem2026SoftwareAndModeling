@@ -1,79 +1,74 @@
 # Repository structure
 
-Three modelling documents, one process chain, one notebook.
+Updated 2026-10-16, after everything the current wiki does not use moved to
+`archive/`.
+
+**Tier 3, synthesis.** This file is the layout and nothing else: one line per
+file, kept in step with what is on disk. The rules are in
+[AGENTS.md](AGENTS.md). **Agents: read it before changing anything.**
 
 ```
-model.ipynb                 the notebook — narrative and every figure
+README.md                   the front door
+AGENTS.md                   the rules. Read first
+CLAUDE.md                   Claude Code notes; points at AGENTS.md
 STRUCTURE.md                this file
+requirements.txt            Python packages
+.ignore                     makes search tools skip archive/
 
-docs/
-  MODEL.md                  all three documents in one file, verbatim
-  MODEL.docx                the same, with a table of contents and figures
-  ISSUES.md                 every discrepancy found while combining them
-  _frontmatter.md           the chain map and joint definitions
-  00_overview_gold_biorecovery.md    Part III, verbatim
-  01_bioleaching.md                  Part I,  verbatim
-  02_golb_expression.md              Part II, verbatim
-  media/                    figures extracted from the Part II document
-  source/                   untouched originals (2 .docx + 1 .md)
+archive/                    retired files at their old paths. Do not read
+                            unless asked. MANIFEST.txt lists them
 
 src/
   params.py                 loads params/*.yaml; lists unsourced parameters
-  leach.py                  Part I   — implemented
-  expression.py             Part II  — implemented
-  recovery_chain.py         Part III — closed forms only; ODE code is a shim
-  interfaces.py             the two joints, with unit checks
+  leach.py                  stages 1 and 2: three-vessel sequential process
+  expression.py             GolB and TetH expression in E. coli
+  interfaces.py             the joints between stages, with unit checks
+  capture_design.py         stage 3: comb capacity and capture design
+  capture_kinetics.py       stage 3: time-dependent capture
+  competition.py            stage 3: gold and copper competition at equilibrium
+  recovery_chain.py         stages 3 to 5: closed forms and entry points
+  recovery_process.py       stage amounts, volumes and lysate mixing
+  recovery_audit.py         recovery checks
+  reduction.py              stage 5: reduction trajectories, gold and electron checks
+  reductase.py              stage 5: growing the reductase and when to lyse
+  sensitivity.py            Latin hypercube, PRCC, Finke-Watzky reduction
+  fit_fw.py                 Finke-Watzky fitting
 
-params/
-  leach.yaml                Part I parameter table, transcribed
-  expression.yaml           Part II parameter table, transcribed
-  recovery_chain.yaml       Part III parameter table, transcribed
-  conversions.yaml          constants needed by the joints, not from the docs
+params/                     one YAML file per model, plus conversions.yaml
+tests/                      one test file per src module
 
-tests/
-  test_expression.py        reproduces every number Part II prints
-  test_leach.py             conservation, geometry, and limit checks
-  test_interfaces.py        unit handling, and the numbers the joints produce
+docs/
+  WIKI_MODEL_UPDATE.md      wiki stages 1 and 2
+  WIKI_BIORECOVERY_DRAFT.md wiki stages 3 to 5. The author's text: do not edit
+  ISSUES.md                 findings record
+  SOURCES.md                papers, each tied to the number it supplies
+  EQUATIONS.md              equation notation
+  check_docs.py             links and tier declarations
+  make_wiki_leaching_figures.py  media/wiki/plots/
+  make_leach_budget.py      media/wiki/concepts/leaching-budget.svg
+  make_biorecovery_figures.py    media/biorecovery/
+  build_biorecovery.py      BIORECOVERY.docx from the stages 3 to 5 draft
+  biorecovery_equations.py  equations for that build
+  reference_biorecovery.docx     style reference for that build
+  _BIORECOVERY_build.md     GENERATED. Do not hand-edit
+  BIORECOVERY.docx          GENERATED. Do not hand-edit
+  make_software_data.py     wiki Software page data, from dashboard-prototype/
+  source/                   verbatim source documents. Never edited
+  media/bioleaching/        stage 1 and 2 figures in WIKI_MODEL_UPDATE.md
+  media/biorecovery/        GENERATED stage 3 to 5 figures
+  media/wiki/plots/         GENERATED wiki plots
+  media/wiki/concepts/      process overview art and the leaching budget figure
+
+dashboard-prototype/        the measurement console; sensors.yaml and
+                            stage_ph.yaml feed the wiki Software page
 ```
-
-## Rules that keep this iterable
-
-1. **No number in a `.py` file.** Every value lives in `params/*.yaml` with its
-   unit, its status, and its source attached. `src/params.py` loads them.
-2. **No equation in the notebook.** Equations live in `src/`. The notebook
-   imports and plots. If you write a `def` in a cell, move it.
-3. **A parameter with no value stays `null`.** Loading it raises a `KeyError`
-   rather than substituting a guess. `model.md` §0 records that every parameter
-   assumed without a source, then sourced, turned out to be wrong.
-4. **Discrepancies get a test, not a fix.** Where the documents disagree, a
-   test pins the disagreement so a later edit cannot hide it. See
-   `docs/ISSUES.md`.
-5. **The source documents are never edited.** Corrections are proposed in
-   `docs/ISSUES.md` and applied by their authors.
 
 ## Setup
 
-```
+```bash
 pip install -r requirements.txt
-python -m pytest tests -q
-jupyter lab model.ipynb
 ```
 
-## To complete Part III
-
-`src/recovery_chain.py` is a shim. `model.md` names three existing files as the
-working code for that part: `pipeline_model.py`, `r9L_fw.py`, `ensemble.py`.
-Copy them into `src/`, then re-export their entry points as described in the
-module docstring. They were not re-implemented here because `model.md` §2 and
-§4.1 record verification checks that already pass against them, and a second
-version would drift from the first.
-
-Once they are in place, extend `ensemble.py` to sample across all three parts.
-The current 90% CI on `eta_total`, [0.0%, 49.4%], excludes leaching and
-expression uncertainty entirely. Closing that is the payoff of the merge.
-
-## Read this first
-
-`docs/ISSUES.md` item 2. The two independent estimates of `q_max` differ by
-about 255×, and `q_max` is the second strongest driver in the chain. No coupled
-result should be quoted until that is settled.
+```bash
+python -m pytest tests -q
+```

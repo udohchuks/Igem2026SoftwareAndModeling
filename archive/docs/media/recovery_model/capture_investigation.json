@@ -1,0 +1,35 @@
+{
+  "feed_umol": 29.0,
+  "biomass_g": 5.0,
+  "active_sites_per_cell": 23300.97087378641,
+  "single_occupancy_capacity_umol_per_g": 0.09131352695604533,
+  "site_amount_umol": 0.45656763478022666,
+  "captured_umol": 0.44564285722362684,
+  "site_occupancy": 0.976071940443482,
+  "targets": [
+    {
+      "target_fraction": 0.5,
+      "required_site_amount_umol": 15.2,
+      "required_biomass_g": 166.4594557531073,
+      "required_capacity_umol_per_g": 3.04,
+      "required_active_sites_per_cell": 775733.3860338982,
+      "fresh_contacts": 33
+    },
+    {
+      "target_fraction": 0.9,
+      "required_site_amount_umol": 32.400000000000006,
+      "required_biomass_g": 354.8214714737288,
+      "required_capacity_umol_per_g": 6.480000000000001,
+      "required_active_sites_per_cell": 1653536.954440678,
+      "fresh_contacts": 61
+    },
+    {
+      "target_fraction": 0.95,
+      "required_site_amount_umol": 40.84999999999998,
+      "required_biomass_g": 447.3597873364757,
+      "required_capacity_umol_per_g": 8.169999999999996,
+      "required_active_sites_per_cell": 2084783.4749661004,
+      "fresh_contacts": 66
+    }
+  ]
+}

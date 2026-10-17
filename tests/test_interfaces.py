@@ -107,60 +107,48 @@ def test_time_unit_round_trip():
     assert interfaces.per_minute(interfaces.per_hour(0.1)) == pytest.approx(0.1)
 
 
-def test_elution_uses_pseudo_second_order_and_the_ceiling_is_unchanged():
-    """The default rate law is PSO from 2026-08-16. ISSUES.md item 47.
-
-    Both laws stop at (1-phi), so phi and every ceiling argument in REVIEW.md
-    6.2 are unaffected. Only the approach differs: 50% of the ceiling at 1/k
-    and 95% at 19/k, against 0.69/k and 3/k for the superseded PFO.
-    """
-    phi, k = 0.13, 2.0
+def test_elution_uses_first_order_and_the_s60_ceiling():
+    """The provisional default is first order. ISSUES.md item 47."""
+    elution = params.load("recovery_chain")["elution"]
+    phi = elution["phi"]["value"]
+    k = elution["k_elute"]["value"]
     ceiling = 1 - phi
     assert recovery_chain.eta_elute(0.0, phi, k) == 0.0
     assert recovery_chain.eta_elute(1e9, phi, k) == pytest.approx(ceiling)
-    assert recovery_chain.eta_elute(1.0 / k, phi, k) == pytest.approx(0.5 * ceiling)
-    assert recovery_chain.eta_elute(19.0 / k, phi, k) == pytest.approx(0.95 * ceiling)
+    assert recovery_chain.eta_elute(math.log(2.0) / k, phi, k) == pytest.approx(
+        0.5 * ceiling)
+    assert recovery_chain.eta_elute(-math.log(0.05) / k, phi, k) == pytest.approx(
+        0.95 * ceiling)
 
 
-def test_pfo_is_retained_and_is_the_optimistic_law():
-    """PFO stays callable so the comparison figure and old numbers reproduce.
-
-    It reaches the ceiling far sooner than PSO. Pinning the gap stops anyone
-    quoting a PFO contact time while the eluent and the rate law are open.
-    """
-    phi, k, ceiling = 0.13, 2.0, 0.87
+def test_pso_is_retained_for_comparison():
+    """The retired PSO law remains callable for the comparison figure."""
+    elution = params.load("recovery_chain")["elution"]
+    phi = elution["phi"]["value"]
+    k = elution["k_elute"]["value"]
+    ceiling = 1.0 - phi
     assert recovery_chain.eta_elute_pfo(0.0, phi, k) == 0.0
     assert recovery_chain.eta_elute_pfo(1e6, phi, k) == pytest.approx(ceiling)
     assert recovery_chain.eta_elute_pfo(3.0 / k, phi, k) == pytest.approx(
         0.95 * ceiling, rel=0.01)
-
-    # The switch cost, at the 6 h operating point sensitivity.py uses.
-    assert recovery_chain.eta_elute_pfo(6.0, phi, k) == pytest.approx(0.8700, abs=5e-4)
-    assert recovery_chain.eta_elute(6.0, phi, k) == pytest.approx(0.8031, abs=5e-4)
+    assert recovery_chain.eta_elute_pso(1.0 / k, phi, k) == pytest.approx(
+        0.5 * ceiling)
 
 
-def test_elution_has_one_rate_constant_and_the_model_is_PSO():
-    """One eluent, one rate constant. The eluent is still unchosen.
-
-    k_elute follows the eluent (ISSUES.md item 28) and is a placeholder until
-    that choice is made. A second symbol k_elute_pso existed briefly and was
-    dropped; this pins that the step does not regrow one, and that the rate
-    law does not silently revert.
-
-    CHANGED 2026-08-24. k_elute was pinned here as source: None. It now carries
-    published anchors and a band, so the assertion is that the VALUE has not
-    moved and the band still contains it. The step is still unmeasured on this
-    sorbent: only S60 yields a rate, 1.1 h^-1, and it is the band's floor.
-    """
+def test_elution_has_one_rate_constant_and_the_model_is_PFO():
+    """Pin the 2026-09-18 first-order decision and S60-derived lower bound."""
     elution = params.load("recovery_chain")["elution"]
-    assert elution["kinetic_model"]["value"] == "PSO"
-    assert elution["kinetic_model"]["superseded"]["value"] == "PFO"
+    assert elution["kinetic_model"]["value"] == "PFO"
+    assert elution["kinetic_model"]["superseded"]["value"] == "PSO"
     assert "k_elute_pso" not in elution
-    assert elution["k_elute"]["value"] == 2.0
-    assert elution["k_elute"]["source"] == ["S60", "S24", "S61", "S62"]
+    assert elution["k_elute"]["value"] == 0.22
+    assert elution["k_elute"]["source"] == "S60"
     lo, hi = elution["k_elute"]["range"]
-    assert lo < elution["k_elute"]["value"] < hi
-    assert elution["phi"]["source"] == "S59"
+    assert lo <= elution["k_elute"]["value"] < hi
+    assert elution["phi"]["source"] == "S60"
+    assert elution["TU"]["value"] == 0.1
+    assert elution["sulfuric_acid"]["value"] == 0.1
+    assert elution["elution_temperature"]["value"] == 50.0
 
 
 def test_capacity_ceiling_after_adopting_part_II():
@@ -231,15 +219,13 @@ def test_part_II_and_part_III_now_agree_on_growth_rate():
     assert interfaces.per_hour(mu_II_per_min) == pytest.approx(mu_III_per_h, rel=0.01)
 
 
-def test_K_Au_was_deliberately_not_adopted_from_part_II():
-    """The one exception to the adopt-Part-II decision. See ISSUES.md item 1.
-
-    Both documents now use the name K_Au for the GolB-gold dissociation
-    constant, which makes the 10 uM vs 0.1 uM conflict impossible to miss.
-    """
+def test_K_Au_uses_closest_GolB_literature_proxy():
+    """S78 superseded the unsourced proxy on 2026-09-18. ISSUES.md item 1."""
     p3 = params.load("recovery_chain")["V1_capture"]["K_Au"]
-    assert p3["value"] == 0.1
-    assert "decision_2026_08_10" in p3
+    assert p3["value"] == 0.7
+    assert p3["source"] == "S78"
+    assert p3["sweep"] == [0.2, 1.15]
+    assert p3["superseded_2026_09_18"]["value"] == 0.1
     assert params.load("expression")["K_Au"]["value"] == 10.0   # the placeholder
     assert params.load("expression")["K_Au"]["status"] == "placeholder"
 
@@ -343,15 +329,16 @@ def test_part_I_growth_rate_now_matches_the_other_two_parts():
 # the two cannot drift apart again.
 # ---------------------------------------------------------------------------
 
-K_AU_III = 0.1        # params/recovery_chain.yaml :: V1_capture.K_Au
-X_MAX = 5.0           # params/recovery_chain.yaml :: V1_capture.X_max
+P_CAPTURE = params.values(params.load("recovery_chain")["V1_capture"])
+K_AU_III = P_CAPTURE["K_Au"]
+X_MAX = P_CAPTURE["X_max"]
 
 
 def test_isotherm_applied_to_total_gold_is_unphysical():
     """Why capture_equilibrium exists. The isotherm alone can exceed the feed.
 
-    S0 = 22 uM of sites, 10 uM of gold in: the isotherm reports 21.8 uM bound,
-    which is 218% of what was added. This is not a bug in the isotherm; it is
+    S0 = 22 uM of sites and 10 uM of gold in: the isotherm reports more gold
+    bound than was added. This is not a bug in the isotherm; it is
     what happens when total gold is passed where free gold belongs.
     """
     bound = recovery_chain.capture_langmuir_isotherm(10.0, 22.0, K_AU_III)
@@ -371,9 +358,9 @@ def test_capture_never_exceeds_the_feed_or_the_sites():
 def test_capture_reproduces_master_step_8_table():
     """MASTER.md step 8, all fifteen cells, to one decimal place."""
     published = {
-        0.0163: {0.05: 38.4, 0.5: 13.2, 1.0: 7.4, 10.0: 0.8, 50.0: 0.2},
-        0.2964: {0.05: 93.5, 0.5: 91.1, 1.0: 86.1, 10.0: 14.6, 50.0: 3.0},
-        4.4:    {0.05: 99.5, 0.5: 99.5, 1.0: 99.5, 10.0: 99.2, 50.0: 43.8},
+        0.0913: {0.05: 38.45, 0.5: 30.34, 1.0: 23.79, 10.0: 4.25, 50.0: 0.90},
+        0.1961: {0.05: 57.62, 0.5: 50.91, 1.0: 43.71, 10.0: 9.10, 50.0: 1.93},
+        4.4:    {0.05: 96.91, 0.5: 96.85, 1.0: 96.78, 10.0: 94.71, 50.0: 42.95},
     }
     for q_max, row in published.items():
         for feed, percent in row.items():
@@ -381,14 +368,14 @@ def test_capture_reproduces_master_step_8_table():
             assert got == pytest.approx(percent, abs=0.05), (q_max, feed)
 
 
-def test_K_Au_swing_reproduces_issue_1_table():
-    """ISSUES.md item 1: K_Au moved from insensitive to a 2.6x lever."""
-    S0 = 0.0163 * X_MAX
-    published = {0.02: 2.36, 0.05: 2.60, 0.10: 2.47, 0.50: 1.23, 10.0: 1.01}
+def test_K_Au_literature_range_reproduces_issue_1_update():
+    """The S78 variant range remains a material low-feed uncertainty."""
+    S0 = 0.0913 * X_MAX
+    published = {0.02: 2.446, 0.05: 2.442, 0.10: 2.432, 0.50: 2.203, 10.0: 1.097}
     for feed, swing in published.items():
-        lo = recovery_chain.eta_capture(feed, S0, 1e-4)
-        hi = recovery_chain.eta_capture(feed, S0, 0.1)
-        assert lo / hi == pytest.approx(swing, abs=0.01), feed
+        lo = recovery_chain.eta_capture(feed, S0, 0.2)
+        hi = recovery_chain.eta_capture(feed, S0, 1.15)
+        assert lo / hi == pytest.approx(swing, abs=0.002), feed
 
 
 def test_capture_reaches_its_two_limits():

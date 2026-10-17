@@ -1,0 +1,149 @@
+# pH set point per process stage, for the dashboard prototype.
+#
+# PROTOTYPE FILE. Not part of the model, and not an authority for anything.
+# `params/` holds every number the model uses. This file exists only because
+# the model has no per-stage pH block, and a controller needs one.
+#
+# Two repository rules are carried here on purpose:
+#   - every value states its unit, status and source
+#   - a value with no source stays null, and the console refuses to run that
+#     stage rather than substituting a guess (AGENTS.md section 1, rule 4)
+#
+# THE CONFLICT THIS FILE MAKES VISIBLE. ISSUES.md item 23 states it plainly:
+# the chain wants TetH at pH 3, E. coli at pH 7 and the leach at pH 9.3 to
+# 10.5. That is about 6.5 pH units across one process. Nothing in the model
+# costs the titrant needed to cross it.
+
+meta:
+  generated_for: dashboard-prototype/index.html
+  authority: "params/*.yaml and docs/ISSUES.md. This file only collects."
+  date: "2026-09-18"
+
+stages:
+
+  - key: culture
+    index: 1
+    name: Culture and expression
+    vessel: V1
+    runnable: false
+    pH_set: 7.0
+    pH_floor: null
+    pH_ceiling: null
+    status: organism_requirement
+    source: "docs/ISSUES.md items 23, 32"
+    note: >-
+      E. coli runs the whole chain and wants roughly neutral. No window is
+      recorded anywhere in this repository, so the floor and the ceiling stay
+      null. Not modelled; listed because it is one of the three points in the
+      6.5 pH unit conflict.
+
+  - key: hydrolysis
+    index: 2
+    name: Tetrathionate hydrolysis
+    vessel: V2
+    runnable: true
+    pH_set: 3.0
+    pH_floor: null
+    pH_ceiling: null
+    status: measured_optimum
+    source: "docs/ISSUES.md item 38; k_cat = 125 /min measured at pH 3 and 30 C"
+    conflict: >-
+      THIOSULFATE DOES NOT SURVIVE AT pH 3. It disproportionates in acid,
+      S2O3(2-) + 2 H+ -> S(0) + SO2 + H2O, and Stage 2's whole purpose is to
+      bank 94 mM of thiosulfate. Thiosulfate wants pH above about 4 and
+      comfortably above 5. TetH's mechanism needs a protonated Asp325 and its
+      optimum is pH 3.0. The model has no term for the acid loss, so the model
+      cannot see the problem. ISSUES.md item 38. Treat the 95.9 % conversion
+      in three days as an UPPER BOUND.
+    proton_yield_per_S4O6: null
+    proton_yield_note: >-
+      HELD NULL. No proton balance for the hydrolysis vessel exists in the
+      model, so the console cannot predict titrant demand for this stage. The
+      page offers an operator-set value purely to demonstrate the controller,
+      and labels every number it produces as an assumption.
+
+  - key: leach
+    index: 3
+    name: Bioleaching
+    vessel: V3
+    runnable: true
+    pH_set: null
+    pH_floor: 9.3
+    pH_ceiling: 10.5
+    recommended: [10.0, 10.3]
+    status: operating_choice
+    source: "params/leach.yaml pH_balance; docs/ISSUES.md item 23"
+    note: >-
+      The set point is null in params/leach.yaml and the console reads it from
+      the selected scenario instead. The window is not about gold, which is
+      reported flat over pH 9 to 11. It is about lixiviant survival: below 9.3
+      thiosulfate decomposes and glycine is under a quarter dissociated; above
+      10.5 the trithionate leg accelerates and Cu(OH)2 passivates the
+      particles. This is the only stage with a modelled titrant demand.
+
+  - key: capture
+    index: 4
+    name: Capture on displayed GolB
+    vessel: V3
+    runnable: false
+    pH_set: null
+    pH_floor: 9.0
+    pH_ceiling: 10.5
+    status: analogue_only
+    source: "docs/ISSUES.md item 23, citing SOURCES.md S12 and S13"
+    note: >-
+      The window is for THIOL CAPTURE of the Au(I) thiosulfate complex, not for
+      GolB. What pH the displayed GolB itself tolerates was never checked; item
+      23 records that as open. The set point stays null.
+
+  - key: elution
+    index: 5
+    name: Elution
+    vessel: V4
+    runnable: false
+    pH_set: null
+    pH_floor: null
+    pH_ceiling: null
+    status: undetermined
+    source: "docs/ISSUES.md item 28"
+    note: >-
+      The eluent is not chosen. Choosing it fixes k_elute and phi together, and
+      it fixes the pH with them. Nothing can be set here until that call is
+      made.
+
+  - key: reduction
+    index: 6
+    name: Reduction to metal
+    vessel: V4
+    runnable: false
+    pH_set: 7.0
+    pH_floor: null
+    pH_ceiling: null
+    status: analogue_only
+    source: "params/recovery_chain.yaml, k_grow floor; SOURCES.md S53"
+    note: >-
+      GolR, a purified Au(III) reductase from Erwinia sp. IMH, reduced about
+      67 % of 2 mM Au(III) in 2 h at 30 C and pH 7 with 1 mM NADH. It is a
+      DIFFERENT PROTEIN from ours and it is one endpoint, not a time course.
+      The pH is carried over with the rate constant and is not a design choice.
+
+# Display assumptions of the console. NOT chemistry, NOT from params/.
+# They exist so the prototype can draw a pH that moves. Do not copy them into
+# a real controller without a measurement behind them.
+display_assumptions:
+  buffer_capacity:
+    value: 250.0
+    unit: umol/L per pH unit
+    note: >-
+      Converts unmet titrant demand into a pH deviation on screen. Chosen so
+      one pump pulse moves the trace visibly. No source.
+  deadband:
+    value: 0.10
+    unit: pH
+    note: >-
+      Operator adjustable. A deadband stops the pump chattering and stops it
+      over-dosing, which drives osmolality up.
+  mixing_time:
+    value: 1.0
+    unit: min
+    note: One control tick. The console will not dose twice without a new reading.

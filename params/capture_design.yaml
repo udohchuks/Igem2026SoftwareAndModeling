@@ -1,0 +1,377 @@
+meta:
+  purpose: Capture sizing investigation, 2026-09-07; targets are design questions, not measurements.
+analysis:
+  target_fractions:
+    value: [0.5, 0.9, 0.95]
+    unit: fraction
+    status: design_targets
+    source: ISSUES 91; sizing response to low capture recovery
+  contacts:
+    value: 80
+    unit: count
+    status: numerical_scenario
+    source: ISSUES 91; fresh biomass contacts, no assumption of regeneration
+  grid_points:
+    value: 150
+    unit: count
+    status: numerical_setting
+    source: ISSUES 91; capacity investigation figure
+  capacity_multiplier_max:
+    value: 100
+    unit: dimensionless
+    status: illustrative_sweep
+    source: ISSUES 91; tests required capacity, not an achievable engineering claim
+stage3_design:
+  meta:
+    purpose: >-
+      Inputs for the stage 3 design questions in docs/CAPTURE_DESIGN.md,
+      computed by docs/capture_design_analysis.py. Added 2026-10-17.
+  gold_feed:
+    value: 37.16
+    unit: uM
+    status: handoff_from_bioleaching_model
+    source: >-
+      docs/source/bioleaching_2026-10-17/Bioleaching_Models_v8.docx, stage 3,
+      24 h leach with ammonia: 36.6 % of 101.54 umol/L on the boards.
+  gold_feed_author_case:
+    value: 44.0
+    unit: uM
+    status: author_scenario
+    source: Author's high-grade case, 2026-10-17
+  copper_band:
+    value: [0.0, 300.0, 858.0, 6000.0]
+    unit: uM
+    status: scenario_band_not_a_prediction
+    source: >-
+      858 is the Cu(II) peak when leaching stops with ammonia (v8 stage 3,
+      about 29 h); the 24 h value is not reported. 6000 is the author's
+      high-copper case, 2026-10-17. 0 and 300 bracket them.
+  selectivity_band:
+    value: null
+    unit: dimensionless
+    status: retired_2026-10-17
+    superseded:
+      value: [5.3e+03, 5.3e+08]
+      reason: >-
+        Retired 2026-10-17 at the author's direction. Stage 3 now uses GolB's
+        own measured constants directly (binding_proxies.wei2012_golb_Kd_Au and
+        wei2012_golb_Kd_Cu), so no selectivity ratio is needed. This value was
+        a thiosulfate correction built from estimated stability constants.
+        ISSUES 93.
+  selectivity_design:
+    value: null
+    unit: dimensionless
+    status: retired_2026-10-17
+    superseded:
+      value: 5.3e+03
+      reason: >-
+        Retired 2026-10-17 at the author's direction. Stage 3 now uses GolB's
+        own measured constants directly (binding_proxies.wei2012_golb_Kd_Au and
+        wei2012_golb_Kd_Cu), so no selectivity ratio is needed. This value was
+        a thiosulfate correction built from estimated stability constants.
+        ISSUES 93.
+  gold_feed_no_ammonia:
+    value: 19.99
+    unit: uM
+    status: handoff_from_bioleaching_model
+    source: >-
+      Bioleaching_Models_v8.docx, stage 3, 24 h leach without ammonia: 19.69 %
+      of 101.54 umol/L on the boards.
+  copper_peak_ammonia:
+    value: 858.0
+    unit: uM
+    status: handoff_from_bioleaching_model_upper_bound
+    source: >-
+      Bioleaching_Models_v8.docx, stage 3 with ammonia: the Cu(II) maximum when
+      leaching stops, at about 29 h. The 24 h value is not reported.
+  report_cell_loadings:
+    value: [4.0, 8.0, 12.0, 20.0, 30.0, 40.0]
+    unit: g dry cells/L
+    status: presentation_setting
+    source: Rows of the Q1 tables
+  dip_target_fraction:
+    value: 0.99
+    unit: fraction of the scarcer pool
+    status: design_choice
+    source: >-
+      How full a dip must run before the comb is lifted. 99 % of whichever
+      runs out first, the gold in the batch or the sites on the comb. The
+      last per cent costs as much time as the first ninety.
+  dip_cell_loadings:
+    value: [1.0, 2.0, 3.82, 6.0, 9.52]
+    unit: g dry cells per litre of leachate
+    status: presentation_setting
+    source: >-
+      Rows of the Q3 dip-time table. 3.82 is the 1 L comb of Q2 worked and
+      9.52 is the Q1 loading that captures the design feed in one dip; the
+      rest bracket them.
+  leachate_volume_L:
+    value: 1.0
+    unit: L
+    status: design_choice_bench_basis
+    source: >-
+      The bioleaching model's batch is 1 L, so the comb is designed to sit in
+      1 L of leachate. Scaling this scales the comb with it.
+  leaf_thickness_m:
+    value: 0.001
+    unit: m
+    status: design_choice
+    source: >-
+      A 1 mm plate. It does not enter the capture result; it only adds to the
+      volume the comb stack occupies.
+  panel_length_m:
+    value: 0.10
+    unit: m
+    status: design_choice
+    source: >-
+      docs/CAPTURE_DESIGN.md Q2. Chosen with the hardware team on 2026-10-17 as
+      the smallest comb that clears a batch in about four dips while keeping
+      the leaf gap at 4 mm or more.
+  panel_width_m:
+    value: 0.05
+    unit: m
+    status: design_choice
+    source: docs/CAPTURE_DESIGN.md Q2, with panel_length_m
+  panels_per_comb:
+    value: 2
+    unit: count
+    status: hardware_as_built
+    source: >-
+      The printed comb carries two panels, one above the other, on a central
+      rib, with a stem and disc that plug into the branch.
+  combs_per_branch:
+    value: 30
+    unit: count
+    status: design_choice
+    source: docs/CAPTURE_DESIGN.md Q2
+  areal_density_g_m2:
+    value: 6.36
+    unit: g dry cells per m^2 of panel
+    status: assumption_to_be_measured
+    source: >-
+      How many dry grams of cells one square metre of colonised panel carries.
+      One number, measured in one step: grow a comb, dry it, weigh it, divide
+      by its area. Until the wet lab reports, 6.36 is a working value. Every
+      area and every dip count in Q2 and Q3 scales inversely with it.
+      Superseded the 30-layers-times-monolayer calculation on 2026-10-17.
+  film_thickness_m:
+    value: 3.0e-5
+    unit: m
+    status: assumption_NOT_MEASURED
+    source: >-
+      Biofilm thickness, about 30 um. Used only in the Q3 diffusion
+      comparison, to show the film is never the limit.
+  capture_fractions:
+    value: [0.5, 0.9, 0.99, 0.999]
+    unit: fraction
+    status: presentation_setting
+    source: Rows of the Q3 dip-time table
+  diffusivity_water:
+    value: 6.0e-10
+    unit: m^2/s
+    status: order_of_magnitude_estimate_NOT_SOURCED
+    source: >-
+      Typical for a small anionic metal complex in water. No value for
+      Au(S2O3)2^3- was found. Used only to compare transport times with the
+      binding time, never to set the dip time. ISSUES 93.
+  diffusivity_biofilm_ratio:
+    value: 0.5
+    unit: dimensionless
+    status: rule_of_thumb_NOT_SOURCED
+    source: >-
+      Diffusion inside a biofilm relative to water. A common rule of thumb,
+      not a measurement on this system.
+  design_dips:
+    value: 3
+    unit: count
+    status: design_choice
+    source: >-
+      Dips the branch of 30 combs makes to clear one batch of the design
+      feed. Each dip starts with a fresh comb, so each dip takes the comb's
+      whole capacity. Dips are whole numbers; a dip is a full cycle of
+      dipping, lifting and stripping.
+  design_layers:
+    value: null
+    unit: cell layers
+    status: superseded
+    superseded:
+      value: 30
+      date: 2026-10-17
+      reason: >-
+        The layer count was never measurable. Replaced by areal_density_g_m2,
+        a single number the wet lab can weigh. ISSUES 95.
+  elution_time_h:
+    value: 6.0
+    unit: h
+    status: design_choice_from_the_wiki_reference_scenario
+    source: >-
+      Ashesi Model page, release stage parameter table: t_elution = 6 h,
+      'Reference process scenario'. Sets the shortest cycle: a comb cannot be
+      re-dipped until its gold has been released.
+  dip_time_h:
+    value: 0.5
+    unit: h
+    status: design_choice_set_by_Q3
+    source: >-
+      Set 2026-10-17 by Q3. One fixed dip time is used for every dip of a
+      batch, so the field does not have to time each one. The slowest of the
+      three dips reaches 99 % in 27 min, so half an hour covers all of them.
+      Replacing k_on with a measured value moves this.
+  layer_cases:
+    value: null
+    unit: cell layers
+    status: superseded
+    superseded:
+      value: [1.0, 10.0, 30.0, 50.0, 100.0]
+      date: 2026-10-17
+      reason: The Q2 layer table went with design_layers. ISSUES 95.
+  plant_board_per_day:
+    value: 1000.0
+    unit: kg board/day
+    status: team_decision
+    source: AGENTS.md section 4, 2026-10-16, plant basis of 1 tonne of board a day
+comb_monolayer_assumption:
+  cell_footprint:
+    value: 2.0
+    unit: um^2/cell
+    status: provisional_geometric_assumption
+    source: Wiki modelling discussion, 2026-09-12; replace with a measured attached-biomass density
+  surface_coverage:
+    value: 1.0
+    unit: fraction
+    status: provisional_geometric_assumption
+    source: Wiki modelling decision, 2026-09-12; complete monolayer coverage assumed
+  attached_dry_biomass_density:
+    value: 0.212
+    unit: g dry cells/m^2
+    status: derived_provisional_monolayer_assumption
+    source: >-
+      Derived from the 2.0 um^2/cell footprint, 1.0 surface coverage and
+      params/conversions.yaml cells_per_g_dry_weight = 2.36e+12 cells/g.
+    derivation: >-
+      (1.0 / (2.0e-12 m^2/cell)) / (2.36e+12 cells/g)
+      = 0.2119 g/m^2, rounded to 0.212 g/m^2.
+    caveat: >-
+      Represents one completely covering E. coli layer with no gaps, not a
+      mature multilayer biofilm and not a measurement from the project comb.
+binding_proxies:
+  nazir2022_golsen_wt_K_Au:
+    value: 0.7
+    unit: uM
+    status: adopted_literature_proxy_for_K_Au
+    note: >-
+      Not used by the stage 3 design analysis from 2026-10-17, which takes
+      GolB's measured bare-ion constants (wei2012_golb_Kd_Au and _Kd_Cu)
+      directly. Retained as the apparent-in-buffer reference; the recovery
+      chain still uses it.
+    source: S78; Nazir et al. 2022, GolSeN WT, Table 1
+    conditions: >-
+      Purified soluble ECFP-GolB-Venus sensor in 20 mM MOPS, titrated with
+      HAuCl4 and fitted to a one-site ligand-saturation curve. Same GolB
+      recognition domain and same apparent-Kd equation, but not surface
+      display and not an Au(I)-thiosulfate leachate.
+  wei2012_golb_Kd_Au:
+    value: 3.02e-37
+    unit: M
+    status: measured_GolB_thermodynamic_constant_bare_ion
+    source: S76; Wei et al. 2012, Table 1, read 2026-10-17
+    conditions: >-
+      Purified GolB, Au(I)-S absorption at 250 nm with competitive cyanide
+      titration. A bare-ion thermodynamic constant: it does NOT include the
+      thiosulfate that holds gold in the project leachate, so it must not be
+      used directly as the apparent K_Au of the capture model.
+  wei2012_golb_Kd_Cu:
+    value: 1.61e-17
+    unit: M
+    status: measured_GolB_thermodynamic_constant_bare_ion
+    source: S76; Wei et al. 2012, Table 1, read 2026-10-17
+    conditions: >-
+      Purified GolB, Cu(I) by a published protocol. Same caveat as the gold
+      constant. 1:1 GolB:metal binding confirmed by ESI-MS and a Job plot.
+  wei2012_golb_selectivity_alpha:
+    value: 5.33e+19
+    unit: dimensionless
+    status: measured_GolB_selectivity_bare_ion_upper_bound
+    source: S76; Wei et al. 2012
+    derivation: alpha = Kd_Cu / Kd_Au = 1.61e-17 / 3.02e-37
+    caveat: >-
+      Measured on GolB itself, which the GolS surrogate below is not. It is a
+      bare-ion ratio, so it is an UPPER BOUND on the selectivity in leachate:
+      thiosulfate holds Au(I) far more strongly than Cu(I), which lowers the
+      conditional ratio by the ratio of the two thiosulfate stability
+      constants. Treat as a band with the GolS value until that correction is
+      sourced. ISSUES 93.
+  conditional_selectivity_band:
+    value: null
+    unit: dimensionless
+    status: retired_2026-10-17
+    superseded:
+      value: [5.3e+03, 5.3e+08]
+      reason: >-
+        Retired 2026-10-17 at the author's direction: stage 3 uses the measured
+        GolB constants directly, so the thiosulfate-corrected band is not
+        needed. It was derived as alpha_bare x 10^(logB_Cu - logB_Au) from
+        estimated thiosulfate stability constants (logB_Au 24 to 26, from
+        eprints.ncl.ac.uk/71846; no usable Cu(I) value, 10 to 13 assumed).
+        Kept so the derivation is not lost. ISSUES 93.
+  checa2007_gols_selectivity_alpha:
+    value: null
+    unit: dimensionless
+    status: retired_wrong_protein_and_wrong_quantity
+    source: S79; Checa et al. 2007, matched whole-cell Au/Cu response
+    conditions: >-
+      GolS regulator, not GolB. Apparent half-maximal responses were 0.2 uM
+      for gold and 10.4 uM for copper, giving alpha = 52.
+    superseded:
+      value: 52.0
+      reason: >-
+        Retired 2026-10-17. It is a GolS transcriptional half-maximal RESPONSE
+        ratio, not a GolB binding constant: the wrong quantity from the wrong
+        protein. It was adopted only because GolB's own constants were thought
+        not to exist; S76 supplies them. It is not a safe conservative floor
+        either, because a surrogate can err in either direction. Superseded by
+        conditional_selectivity_band above. ISSUES 93.
+  derived_K_Cu_competition_scenario:
+    value: 36.4
+    unit: uM
+    status: derived_scenario_not_adopted_GolB_constant
+    source: S78 and S79
+    derivation: K_Cu = alpha * K_Au = 52 * 0.7 uM = 36.4 uM
+    caveat: >-
+      Combines a GolB-based gold proxy with GolS selectivity. Use for the
+      labelled working scenario only; do not present it as a measured GolB
+      copper dissociation constant.
+literature:
+  wei2012_loading:
+    value: 4.62
+    unit: umol/g dry cells
+    status: measured_in_other_system_not_a_saturation_capacity
+    source: S76; Wei et al. 2012 Fig5a and text, unit visually verified on PDF page5
+    conditions: Overnight growth/induction with Au(III) chloride in LB; not the project thiosulfate liquor
+  igem2015_bba_k1701000_loading:
+    value: 5.2
+    unit: umol/g dry cells
+    status: measured_in_other_system_not_a_saturation_capacity
+    source: S77; iGEM Registry Part:BBa_K1701000, TasA-displayed GolB under Pveg
+    conditions: >-
+      Bacillus subtilis biofilm display, a different organism and anchor from this
+      project's E. coli construct. Reported as 26-fold above the un-displayed control.
+      The Registry page was not read directly; see S77 for the verification caveat.
+  tsuruta2004_equilibrium_loading:
+    value: 329.0
+    unit: umol/g dry cells
+    status: measured_in_other_system_not_a_saturation_capacity
+    source: S57; Tsuruta 2004 Fig5 fitted Qe
+    conditions: >-
+      Wild-type Pseudomonas maltophilia, Au(III) chloride at pH 3, resting cells.
+      No displayed protein, and at pH 3 part of the uptake is reduction to metal
+      on the cell wall. Not the project thiosulfate liquor.
+  tsuruta2004_langmuir_maximum:
+    value: 992.0
+    unit: umol/g dry cells
+    status: measured_in_other_system_langmuir_maximum
+    source: S57; Tsuruta 2004 Langmuir maximum
+    conditions: >-
+      Same system as tsuruta2004_equilibrium_loading. This is the fitted saturation
+      capacity, the quantity the biosorption field calls q_max. It is quoted here to
+      show what that quantity looks like when measured, not to be adopted.

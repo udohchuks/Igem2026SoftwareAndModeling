@@ -52,7 +52,8 @@ def unsourced(name):
                 status = str(spec.get("status", ""))
                 if any(w in status.lower() for w in
                        ("calibrate", "fitted", "assumed", "placeholder",
-                        "unsourced", "unmeasured", "upper bound")):
+                        "unsourced", "unmeasured", "upper bound",
+                        "secondary", "correlation")):
                     flagged.append((prefix + symbol, status))
             else:
                 walk(spec, prefix + symbol + ".")

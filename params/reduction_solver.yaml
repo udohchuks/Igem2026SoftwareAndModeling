@@ -1,0 +1,44 @@
+meta:
+  purpose: Numerical controls and synthetic verification for the reduction trajectory model.
+solver:
+  rtol:
+    value: 1.0e-8
+    unit: dimensionless
+    status: numerical_setting
+    source: Reduction trajectory conservation verification
+  atol:
+    value: 1.0e-11
+    unit: uM
+    status: numerical_setting
+    source: Reduction trajectory conservation verification
+  points:
+    value: 201
+    unit: count
+    status: numerical_setting
+    source: Reduction report trajectory sampling
+  check_factor:
+    value: 100.0
+    unit: dimensionless
+    status: numerical_setting
+    source: Allow accumulated solver error while rejecting physical violations
+verification:
+  donor_excess_multiplier:
+    value: 1.0e+8
+    unit: dimensionless
+    status: synthetic_test
+    source: Formal donor-excess limit, not an operating recommendation
+  dose_fraction:
+    value: 0.5
+    unit: dimensionless
+    status: synthetic_test
+    source: Structural dose-response comparison
+  donor_limited_fraction:
+    value: 0.25
+    unit: dimensionless
+    status: synthetic_test
+    source: Electron-starvation balance case
+  comparison_tolerance:
+    value: 1.0e-6
+    unit: dimensionless
+    status: numerical_setting
+    source: Independent closed-form comparison

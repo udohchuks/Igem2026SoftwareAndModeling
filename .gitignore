@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 figures/*.png
+
+# Machine-local config
+.claude/settings.local.json
+.mcp.json

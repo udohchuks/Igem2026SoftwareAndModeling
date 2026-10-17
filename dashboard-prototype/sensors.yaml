@@ -1,0 +1,248 @@
+# Sensor and actuator inventory for the bioreactor console.
+#
+# PROTOTYPE FILE. Not part of the model. `params/` holds every number the
+# model uses; this file describes the HARDWARE the console is allowed to talk
+# to, and nothing else.
+#
+# THE RULE THIS FILE ENFORCES. The console may display a live value only if a
+# channel below produces it. A quantity the model computes but no probe can
+# measure is a PREDICTION, and predictions do not appear on the Run screen.
+# Gold dissolved and tetrathionate conversion are the two that moved out.
+#
+# A channel with `feed: none` has no source of data. The console shows it as
+# awaiting a sensor rather than inventing a number, which is AGENTS.md
+# section 1 rule 4 applied to the interface.
+
+meta:
+  generated_for: dashboard-prototype/index.html
+  date: "2026-09-18"
+  hardware_source: "team, 2026-09-18; pH probe and pumps also in params/leach.yaml line 1102"
+  note: >-
+    No probe is attached to this prototype. Channels marked feed: model are
+    driven by an exported model trajectory so the interface can be exercised.
+    The top bar says so.
+
+channels:
+
+  - key: ph
+    name: pH
+    device: pH probe
+    kind: measured
+    unit: pH
+    decimals: 2
+    range: [0.0, 14.0]
+    stale_after_s: 60
+    feed: model
+    predictable: true
+    per_vessel: true
+    source: "params/leach.yaml pH_balance; team equipment 2026-08-19"
+    note: >-
+      ONE PROBE PER VESSEL. See the vessels block at the foot of this file.
+      Monitoring is unconditional: every vessel on that list has its pH read
+      and shown. Dosing is not, because a loop needs a target and several
+      stages have no set point recorded.
+
+  - key: do
+    name: Dissolved oxygen
+    device: Dissolved oxygen probe
+    kind: measured
+    unit: "% sat"
+    decimals: 0
+    range: [0.0, 120.0]
+    stale_after_s: 60
+    feed: model
+    predictable: true
+    source: "params/leach.yaml oxygen block, kLa and C_star"
+    note: >-
+      The console integrates the model's own oxygen balance,
+      dO2/dt = kLa (C* - O2) - OUR, with kLa scaled by the commanded air pump
+      rate. OUR is recovered from the exported trajectory. Stopping the air
+      pump therefore moves this reading through the model, not through a
+      guess.
+
+  - key: temp
+    name: Temperature
+    device: Temperature probe
+    kind: measured
+    unit: "C"
+    decimals: 1
+    range: [0.0, 60.0]
+    stale_after_s: 60
+    feed: none
+    predictable: false
+    source: null
+    note: >-
+      NO FEED. The team deferred temperature on 2026-08-11 and the model
+      carries no temperature state, so nothing can drive this channel. The
+      probe exists; the data path does not. The console shows it awaiting a
+      sensor.
+
+  - key: volts
+    name: Supply voltage
+    device: Voltage monitor
+    kind: equipment
+    unit: "V"
+    decimals: 2
+    range: null
+    stale_after_s: 60
+    feed: none
+    predictable: false
+    source: "team, 2026-09-18"
+    status: confirmed
+    # Nominal rail and the brownout threshold. Both null until the team states
+    # them, so nothing can read a guess. AGENTS.md section 1 rule 4.
+    nominal_V: null
+    alarm_low_V: null
+    note: >-
+      SUPPLY VOLTAGE, confirmed by the team on 2026-09-18. This is an EQUIPMENT
+      variable, not a process variable. It says nothing about the chemistry, so
+      it does not belong among the probe readings and it carries no set point.
+      It sits with the pump states.
+      It matters because the pumps run off it. A sagging rail is the physical
+      cause of the stall that the flow-divergence interlock catches as a
+      symptom. Supply voltage tells the operator WHY the pump fell behind.
+      Not solution potential. Eh or ORP in millivolts is a different
+      measurement and this rig does not take it, so the Cu(II)/Cu(I) couple
+      stays unmeasured. See not_measurable below.
+      NO FEED. Reading it needs telemetry off the power supply, which the rig
+      does not have. The tile says so rather than inventing a number.
+
+  - key: titrant
+    name: Titrant delivered
+    device: Flow meter or balance
+    kind: measured
+    unit: mL
+    decimals: 2
+    range: null
+    stale_after_s: 120
+    feed: model
+    predictable: true
+    per_vessel: true
+    source: "team, 2026-09-18"
+    note: >-
+      Measured, not inferred. Pump run-time times calibrated flow is a
+      COMMANDED quantity and it reports liquid that a stalled pump never
+      delivered. A flow meter or a balance under the reagent bottle catches
+      that. The console shows both and flags the divergence.
+
+actuators:
+
+  - key: pump_titrant
+    name: Titrant pump
+    kind: commanded
+    commands: [stop, rate]
+    rates: [100, 50, 25]
+    default_rate: 100
+    stops_on_interlock: true
+    source: "params/leach.yaml line 1102, team equipment 2026-08-19"
+
+  - key: pump_air
+    name: Air pump
+    kind: commanded
+    commands: [stop, rate]
+    rates: [100, 50, 25]
+    default_rate: 100
+    stops_on_interlock: false
+    source: "params/leach.yaml oxygen block; team equipment"
+    note: >-
+      Rate scales kLa in the model's oxygen balance. Stopping it does not stop
+      the batch, so an interlock does not touch it; it raises an alarm only.
+
+# ---------------------------------------------------------------------------
+# VESSELS. The unit of monitoring and of control.
+#
+# MONITORING IS UNCONDITIONAL. A vessel on this list has its pH read and
+# displayed, whatever else is or is not known about it.
+#
+# CONTROL IS CONDITIONAL. A loop needs a target. The target comes from the
+# stage running in the vessel, in stage_ph.yaml, and several stages record
+# none. A vessel with no target is MONITORED AND NOT DOSED, and the console
+# says which of the two it is doing.
+#
+# volume_L and titrant_stock_mol_L are null for every vessel. They are open
+# decisions 2 and 3 in DASHBOARD_SPEC.md. Nothing may read a guess, so the
+# console carries typed defaults in the interface and tags them.
+#
+# TO ADD A VESSEL: add an entry here, and give its stages a matching `vessel`
+# in stage_ph.yaml. Nothing in index.html enumerates vessels.
+
+vessels:
+
+  - key: V1
+    name: Culture and expression vessel
+    stages: [culture]
+    ph_probe: true
+    titrant_pump: true
+    air_pump: null
+    volume_L: null
+    titrant_stock_mol_L: null
+    feed: none
+    source: "stage_ph.yaml stage 01"
+    note: >-
+      NO FEED. src/expression.py produces a time course for this vessel, but
+      it carries no pH state, so nothing can drive the reading. The organism
+      is also unchosen, ISSUES.md items 23 and 32.
+
+  - key: V2
+    name: Hydrolysis vessel
+    stages: [hydrolysis]
+    ph_probe: true
+    titrant_pump: true
+    air_pump: null
+    volume_L: null
+    titrant_stock_mol_L: null
+    feed: model
+    source: "stage_ph.yaml stage 02"
+    note: "Set point pH 3.0, a measured optimum. ISSUES.md item 38."
+
+  - key: V3
+    name: Leach and capture vessel
+    stages: [leach, capture]
+    ph_probe: true
+    titrant_pump: true
+    air_pump: true
+    volume_L: null
+    titrant_stock_mol_L: null
+    feed: model
+    source: "stage_ph.yaml stages 03 and 04"
+    note: >-
+      TWO STAGES IN ONE VESSEL. The leach window is 9.3 to 10.5 and capture
+      wants 9.0 to 10.5, so the leach operating pH already sits inside
+      capture's window and nothing needs adjusting between them here.
+      The only aerated vessel: params/leach.yaml carries kLa and C_star for
+      this stage and for no other.
+
+  - key: V4
+    name: Elution and reduction vessel
+    stages: [elution, reduction]
+    ph_probe: true
+    titrant_pump: true
+    air_pump: null
+    volume_L: null
+    titrant_stock_mol_L: null
+    feed: none
+    source: "stage_ph.yaml stages 05 and 06"
+    note: >-
+      NO FEED. Both stages have a time course in the model, elution in closed
+      form and reduction from src/reduction.py, but neither carries a pH
+      state. Elution's pH is undetermined, ISSUES.md item 28. Reduction's
+      pH 7.0 is a GolR analogue, SOURCES.md S53.
+      MONITORED, NOT DOSED, until one of those is settled.
+
+# Quantities the model computes that NO channel above can measure. They are
+# predictions. They appear on Setup and on Report, never on the Run screen.
+not_measurable:
+  - key: gold_recovered
+    name: Gold dissolved
+    why: "Needs an assay, AAS or ICP-MS, on a drawn sample. No inline probe."
+  - key: s4o6_conversion
+    name: Tetrathionate conversion
+    why: "Needs a titration on a drawn sample. No inline probe."
+  - key: cu_II
+    name: Cupric copper
+    why: >-
+      No inline probe. An ORP electrode would track the couple indirectly, but
+      the rig carries a supply-voltage monitor, not an ORP electrode.
+  - key: au_feed
+    name: Gold handed to capture
+    why: "Derived from the gold assay, so it inherits the same limitation."

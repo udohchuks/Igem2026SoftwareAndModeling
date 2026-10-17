@@ -1,0 +1,405 @@
+BIORECOVERY LONG-DRAFT SCRATCHPAD
+
+**Tier 3, synthesis.** This file preserves material removed from the public
+biorecovery draft for possible reuse by the modelling team. It is not wiki copy.
+
+**Modelling question:** How much dissolved gold can GolB-displaying cells
+capture?
+
+## Continuing from the leaching stage
+
+Biorecovery continues from the gold dissolved during leaching. The remaining
+printed-circuit-board solids are filtered from the vessel, leaving a liquid
+that contains dissolved gold, copper and residual sulfur species.
+
+GolB-displaying *Escherichia coli* are grown on a reusable, branched comb. The
+comb has flat horizontal leaves that provide surfaces for the cells. It is
+lowered into the filtered leachate for capture, removed from the vessel, washed
+and then transferred to the gold-release stage.
+
+## How we modelled biorecovery
+
+### The chemical exchange represented by the model
+
+Gold enters biorecovery as a soluble gold-thiosulfate complex. GolB presents a
+Cys-X-X-Cys metal-binding motif, represented here as GolB-(SH)₂. Capture is
+treated as ligand exchange between thiosulfate and this binding motif:
+
+Au(S₂O₃)₂³⁻ + GolB-(SH)₂ ⇌ GolB-Au + 2S₂O₃²⁻
+
+This is the capture event represented by the model. Gold leaves its soluble
+thiosulfate complex and becomes associated with the cysteine binding site on
+GolB. The equation groups the intermediate molecular steps into one reversible
+exchange.
+
+Copper is carried into the same stage. Its competing interaction is represented
+schematically as:
+
+Cu-thiosulfate + GolB-(SH)₂ ⇌ GolB-Cu + released thiosulfate
+
+Copper is a competitor because GolB does not provide separate sites for gold
+and copper. Au(I) and Cu(I) can both coordinate to the same two sulfur atoms in
+the Cys-X-X-Cys binding motif. A GolB site occupied by Cu(I) is therefore not
+available to capture Au(I). This matters even when GolB binds gold more
+strongly, because the filtered leachate contains much more dissolved copper
+than gold.
+
+The competition model follows this reversible sharing of the GolB sites.
+Cu(II) is kept separate because it can do something different: it may oxidise
+the cysteine thiols and deactivate a site instead of temporarily occupying it.
+
+### Symbols used in the main model
+
+The model uses concentrations wherever a quantity is expressed relative to the
+capture-liquid volume.
+
+| Symbol | Meaning | Unit |
+|---|---|---:|
+| C_Au,T | Total dissolved gold entering capture | µM |
+| C_Cu,T | Total dissolved copper entering capture | µM |
+| C_Au | Free dissolved gold remaining at equilibrium | µM |
+| C_Cu | Free dissolved copper remaining at equilibrium | µM |
+| B_Au | Gold bound to the comb per liquid volume | µM |
+| B_Cu | Copper bound to the comb per liquid volume | µM |
+| S_T | Effective binding inventory per liquid volume | µM |
+| K_Au | Apparent gold dissociation concentration | µM |
+| K_Cu | Apparent copper dissociation concentration | µM |
+| V_cap | Volume of filtered leachate contacted by the comb | L |
+
+A smaller dissociation concentration represents stronger apparent binding.
+
+## The main gold-capture model
+
+We first ask how much gold can bind when a known GolB-bearing inventory contacts
+the filtered leachate.
+
+The effective binding inventory per liquid volume is:
+
+S_T = (q_Au,ref × m_X) / V_cap
+
+where:
+
+- q_Au,ref is the reference gold loading per gram of dry cells.
+- m_X is the dry cell biomass attached to the comb.
+- V_cap is the volume contacted by the comb.
+
+Using the value reported in the literature:
+
+q_Au,ref = 4.62 µmol Au/g dry cells
+
+Wei et al. measured this loading using surface-displayed GolB on *E. coli*
+[S76]. The experiment used one overnight exposure to 50 µM Au(III) in LB, so
+the value sets the current literature scenario; it is not a measured maximum
+for this project's thiosulfate leachate.
+
+The gold-only equations have not changed. The first equation says that gold
+bound to the cells is no longer free in the liquid:
+
+C_Au = C_Au,T − B_Au
+
+The second is the original Langmuir equation. It relates the free gold to the
+amount bound by the available GolB inventory:
+
+B_Au = (S_T × C_Au) / (K_Au + C_Au)
+
+Together, the equations divide the incoming gold between two places: gold that
+remains dissolved and gold that leaves with the comb. The binding equation uses
+the free concentration, C_Au, because some of the original feed has already
+moved onto the cells.
+
+The amount of gold captured is:
+
+n_Au,captured = V_cap × B_Au
+
+The fraction of incoming gold captured is:
+
+η_Au,capture = B_Au / C_Au,T
+
+This is the original gold-only result. We retain it as the reference for
+showing what changes when copper is present.
+
+## Why copper is included
+
+The filtered leachate does not contain gold alone. In the current 72-hour
+leaching scenario, it contains approximately 29 µM dissolved gold and 818 µM
+total dissolved copper. The feed concentration ratio is therefore:
+
+C_Cu,T / C_Au,T = 818 / 29 = 28.2
+
+This value describes what enters the vessel. It does not tell us how the GolB
+sites will be divided, because GolB does not bind the two metals equally.
+
+We therefore added copper to the original gold-binding model. The purpose of
+this addition is simple: determine how much of the GolB inventory still carries
+gold when both metals are present.
+
+## Modelling competition between gold and copper
+
+Gold and copper share one competitive Langmuir denominator:
+
+D = 1 + (C_Au / K_Au) + (C_Cu / K_Cu)
+
+The bound-gold concentration is:
+
+B_Au = S_T × (C_Au / K_Au) / D
+
+The bound-copper concentration is:
+
+B_Cu = S_T × (C_Cu / K_Cu) / D
+
+Both metals are conserved:
+
+C_Au = C_Au,T − B_Au
+
+C_Cu = C_Cu,T − B_Cu
+
+This keeps the structure of the original model. Each metal has a conservation
+equation, while both metals share one binding expression. Sharing D means that
+increasing copper occupancy reduces the inventory available to gold. The first
+term in D allows some sites to remain empty.
+
+## Representing selectivity
+
+To compare gold and copper binding with one quantity, we use:
+
+α = K_Cu / K_Au
+
+Because K_Au and K_Cu are dissociation concentrations, a larger α means that
+copper binds more weakly than gold. For each value of α:
+
+K_Cu = α × K_Au
+
+The model compares several values of α and shows how gold capture changes as
+GolB becomes more selective for gold. This gives the wet-lab team a target:
+measure whether the real cells provide enough selectivity at the copper-to-gold
+ratio entering capture.
+
+Purified GolB has published dissociation constants of 3.02 × 10⁻³⁷ M for Au(I)
+and 1.61 × 10⁻¹⁷ M for Cu(I), giving an intrinsic ratio of approximately
+5.3 × 10¹⁹ [S76]. The gold value was obtained by cyanide competition and the
+copper value by a Cu(I)-BCS competitive-ligand method described in the
+supplement. These measurements establish strong molecular preference for gold,
+but they do not transfer directly to surface-displayed GolB in alkaline
+thiosulfate leachate. They are therefore mechanistic evidence, not process
+parameters.
+
+Wei et al. also tested 1, 5 and 50 µM mixtures of several metal ions in Figures
+5b and 5c. Those experiments reported metal recovery after papain treatment,
+not a gold-only equilibrium isotherm, and cannot supply K_Au or K_Cu. The
+reported value near 89% is the fraction of previously adsorbed gold released by
+papain, not the fraction of all recovered metals that was gold.
+
+## What the model currently shows
+
+The current calculation uses:
+
+- C_Au,T = 29 µM dissolved gold.
+- C_Cu,T = 818 µM total dissolved copper.
+- S_T = 23.1 µM effective binding inventory.
+- q_Au,ref = 4.62 µmol Au/g dry cells.
+- K_Au = 0.1 µM as the current recovery-model proxy.
+- α as a selectivity sweep.
+
+Because K_Au has not been measured in the project liquid, we also repeat the
+calculation across the declared sensitivity cases. The table reports the
+fraction of incoming gold captured:
+
+| K_Au | α = 10 | α = 100 | α = 1,000 | α = 10,000 | Copper-free |
+|---:|---:|---:|---:|---:|---:|
+| 0.0001 µM | 18.21% | 50.81% | 72.31% | 78.62% | 79.65% |
+| 0.1 µM, current proxy | 18.20% | 50.65% | 71.67% | 77.50% | 78.40% |
+| 1 µM | 18.06% | 49.23% | 66.96% | 70.67% | 71.15% |
+| 10 µM, Part II placeholder | 16.81% | 39.26% | 46.82% | 47.81% | 47.92% |
+
+Across K_Au values from 0.0001 to 1 µM, the low-selectivity results change
+little. The 10 µM placeholder produces a materially lower capture ceiling.
+This shows why the copper-free value of 78.40% must also be described as
+conditional on the current K_Au proxy.
+
+For the current 0.1 µM proxy, gold and copper occupy equal shares at an α of
+approximately 46.1, not at the feed ratio of 28.2. At α = 28.2, the model gives
+approximately 41% of the inventory to gold and 59% to copper.
+
+The practical result is that copper competition can affect recovery even when
+GolB favours gold. Under the current proxy conditions, an apparent α near
+1,000 is required to keep the loss of gold capture below approximately 10% of
+the copper-free result.
+
+## Model assumptions
+
+1. Gold and copper compete for one effective binding inventory.
+2. Each occupied unit of that inventory carries one metal ion.
+3. The capture contact is long enough to approach equilibrium.
+4. Mixing is sufficient for the liquid to be represented by uniform
+   concentrations.
+5. The 4.62 µmol Au/g dry cells result is transferred as a literature reference
+   loading, not a project measurement or fitted maximum.
+6. K_Au is an apparent process constant. Its current value is a proxy and its
+   effect is shown through the sensitivity table.
+7. K_Cu is represented through the α sweep until competitive measurements are
+   available.
+8. Cu(I) binding competition and Cu(II)-driven cysteine damage are separate
+   processes.
+9. Washing and elution occur after the equilibrium capture calculation.
+10. Background adsorption to cells and hardware is not included in the
+    reference calculation and must be separated experimentally.
+
+## Parameters and evidence status
+
+| Parameter | Value used now | Unit | Evidence status |
+|---|---:|---:|---|
+| q_Au,ref | 4.62 | µmol Au/g dry cells | Literature endpoint for GolB displayed on *E. coli*, S76 |
+| m_X | 5.0 in the reference calculation | g dry cells | Previous numerical scenario; replaced by measured comb biomass |
+| V_cap | 1.0 in the reference calculation | L | Numerical scenario; hardware must supply the operating volume |
+| S_T | 23.1 in the literature-loading scenario | µM | Calculated as q_Au,ref × m_X / V_cap |
+| C_Au,T | approximately 29 | µM | Current 72-hour leaching-model handover |
+| C_Cu,T | approximately 818 | µM | Current 72-hour leaching-model handover |
+| K_Au | 0.1 | µM | Current recovery-model proxy; not measured in project leachate |
+| K_Au sensitivity cases | 0.0001, 1 and 10 | µM | Conditional sensitivity cases; 10 µM is the Part II placeholder |
+| K_Cu | α × K_Au | µM | Calculated within each selectivity case |
+| α | 10 to 10,000 in the main table | dimensionless | Design sweep; fitted value required from competition experiments |
+| σ_X | 0.212 | g dry cells/m² | Provisional complete-monolayer estimate |
+
+The project-matrix whole-cell q_Au,max and competitive K_Cu remain unmeasured.
+The table distinguishes those required measurements from the values used to
+explore the model.
+
+<details>
+<summary><strong>How comb area supplies the biomass input</strong></summary>
+
+The hardware model converts the wetted comb area into attached dry biomass:
+
+m_X = a_comb × σ_X
+
+where:
+
+- a_comb is the wetted, colonisable area on both sides of every leaf, in m².
+- σ_X is the attached dry biomass per unit area, in g dry cells/m².
+
+Until the real comb is measured, we use a provisional monolayer estimate. One
+cell is assumed to occupy 2.0 µm², cells are assumed to cover the complete
+surface, and the repository uses 2.36 × 10¹² cells/g dry biomass [S30].
+
+σ_X = [1 / (2.0 × 10⁻¹² m²/cell)] / (2.36 × 10¹² cells/g)
+
+σ_X = 0.212 g dry cells/m²
+
+The primary literature-loading scenario therefore gives:
+
+n_cap = q_Au,ref × σ_X × a_comb
+
+n_cap = 4.62 × 0.212 × a_comb
+
+n_cap = 0.979 × a_comb µmol Au
+
+Each square metre provides a conditional gold-only inventory of 0.979 µmol.
+Reproducing the previous 23.1 µmol inventory would require:
+
+a_comb = 23.1 / (4.62 × 0.212)
+
+a_comb = 23.6 m²
+
+This translates the former 5 g biomass scenario into an area. It is not yet the
+final comb specification. The required area must be recalculated after the
+attached biomass and competitive binding parameters are measured.
+
+</details>
+
+## Measurements required to replace the proxy values
+
+### 1. Measure the equilibrium contact time
+
+Expose equivalent GolB-coated comb pieces to the same synthetic process liquid
+and measure dissolved gold over time. Use a contact time after the remaining
+gold concentration has stopped changing. This prevents slow uptake from being
+mistaken for weak equilibrium binding.
+
+### 2. Fit the gold-only isotherm
+
+Use a synthetic liquid matching the intended pH, thiosulfate, glycine, ionic
+strength and temperature. Measure the matrix-specific ICP-MS or ICP-OES
+detection and quantification limits before selecting the lowest gold
+concentrations.
+
+The concentration series must include points below 1 µM. If the current
+0.1 µM proxy is near the eventual result, measurements at only 1–100 µM would
+all lie close to the loading plateau and would not identify K_Au.
+
+A proposed initial series, subject to the measured quantification limit, is:
+
+0, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30 and 100 µM gold
+
+Run a pilot first and adjust m_X/V_cap so the change between initial and
+equilibrium gold remains large relative to analytical uncertainty without
+exhausting almost all gold from the liquid.
+
+Calculate the equilibrium loading from:
+
+q_Au = [(C_Au,0 − C_Au,e) × V_cap] / m_X
+
+Fit:
+
+q_Au = q_Au,max × C_Au,e / (K_Au + C_Au,e)
+
+This supplies the project-specific q_Au,max and K_Au. The fit should report
+uncertainty, residuals and the concentration range used. If the experiment
+does not reach a plateau, q_Au,max should not be reported as an identified
+maximum.
+
+### 3. Fit copper competition
+
+After fitting the gold-only isotherm, hold gold near the expected process
+concentration and vary copper from no copper to the concentration measured in
+the filtered leachate. Measure both metals at equilibrium and fit all samples
+together using the two-metal model.
+
+The feed ratio of 28.2 provides a useful concentration scale for designing the
+experiment, but it is not the equilibrium tie value. The design should include
+conditions on both sides of the modelled transition.
+
+If copper produces a measurable effect, fit K_Cu and calculate
+α = K_Cu/K_Au. If no effect is resolved within the tested concentration and
+analytical range, report a lower bound, α > x, rather than an exact estimate.
+
+Include:
+
+- GolB-displaying cells.
+- Uninduced or non-GolB cells.
+- A cell-free comb.
+- A liquid-only stability blank.
+- Independent biological replicates.
+- Directly measured attached dry biomass.
+
+Test Cu(I)-thiosulfate and Cu(II) separately where possible. The first tests
+competition; the second can also reveal oxidative damage to GolB cysteines.
+
+### 4. Follow both metals through the filter sequence
+
+Measure gold and copper in:
+
+1. The filtered leachate before capture.
+2. The liquid remaining after capture.
+3. The combined wash liquid.
+4. The final eluate.
+
+These measurements distinguish equilibrium capture from usable recovery. A
+comb that binds gold but loses it during washing, or carries copper into the
+eluate, has not yet achieved selective gold recovery.
+
+## Conclusion
+
+The biorecovery model begins with the amount of GolB-displaying biomass on the
+comb and calculates how gold and copper divide its effective binding inventory.
+It conserves both metals and connects the captured-gold amount directly to the
+next process stage.
+
+The current sensitivity analysis shows that copper competition can reduce gold
+capture even when GolB favours gold, because copper is much more abundant in
+the filtered leachate. The conclusion remains stable across the lower K_Au
+cases, while the 10 µM placeholder produces a lower capture ceiling.
+
+The next modelling improvement is therefore experimental rather than
+structural: measure attached biomass, fit a gold-only isotherm in the intended
+process liquid, and then fit the competitive response to copper. These results
+will replace the current proxy and selectivity sweep without changing the main
+model.

@@ -1,0 +1,21 @@
+{
+  "basis": "Production-scale downstream wetted-area design input and dissolved-gold feed; capture from params/capture_design.yaml, not params/recovery_chain.yaml",
+  "q_Au_umol_per_g": 4.62,
+  "rho_X_g_per_m2": 0.212,
+  "downstream_wetted_area_m2": 23.6,
+  "derived_dry_biomass_g": 5.0032000000000005,
+  "comb_capacity_umol": 23.114784000000004,
+  "site_inventory_uM": 23.114784000000004,
+  "K_Au_uM": 0.7,
+  "K_Cu_uM": 36.4,
+  "k_on_Au_per_uM_h": 1.0,
+  "feed_uM": 29.0,
+  "eta_capture": 0.7313503437800152,
+  "eta_capture_stress": 0.4093457445411507,
+  "eta_elute": 0.7108787570931252,
+  "eta_reduce": 1.0000000000000013,
+  "eta_total": 0.5199014233859677,
+  "eta_total_stress": 0.2909951941007735,
+  "eluate_uM": 15.077141278193043,
+  "gold_balance_residual_uM": 3.552713678800501e-14
+}

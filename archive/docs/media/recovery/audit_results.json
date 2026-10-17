@@ -1,0 +1,25 @@
+{
+  "basis": "Equal stage volumes; fixed protein target; no collection model; scenario not validation",
+  "q_max_umol_per_g": 0.09131352695604533,
+  "site_inventory_uM": 0.45656763478022666,
+  "reference": {
+    "eta_capture": 0.015366995076676788,
+    "eta_elute": 0.7108787570931252,
+    "eta_reduce": 0.9999999999436007,
+    "eta_total": 0.010924070359748059,
+    "feed_uM": 29.0,
+    "bound_uM": 0.44564285722362684,
+    "eluate_uM": 0.3167980404505609,
+    "metal_umol_per_initial_L": 0.3167980404326937
+  },
+  "kinetic_scenarios": {
+    "slow_corner": 0.0012090527203877548,
+    "fast_corner": 1.0000000000000333
+  },
+  "grid_conversion_min": 0.0012090527203877548,
+  "grid_conversion_max": 1.0000000004093408,
+  "grid_shape": [
+    100,
+    100
+  ]
+}

@@ -1,0 +1,64 @@
+meta:
+  purpose: Reproducible recovery review, 2026-09-06. Scenario settings are not measurements.
+operating:
+  Au_feed:
+    value: 29.0
+    unit: uM
+    status: report_scenario
+    source: RECOVERY operating case; ISSUES 84
+  t_elute_h:
+    value: 6.0
+    unit: h
+    status: design_choice
+    source: RECOVERY operating wash
+  t_reduce_h:
+    value: 24.0
+    unit: h
+    status: design_choice
+    source: RECOVERY batch; S35
+  grid_points:
+    value: 100
+    unit: count
+    status: numerical_setting
+    source: ISSUES 84 reproducibility grid
+verification:
+  plateau_fraction:
+    value: 0.95
+    unit: fraction
+    status: numerical_setting
+    source: Historical harvest criterion, now tested against the analytic plateau
+  short_fraction:
+    value: 0.3
+    unit: fraction
+    status: synthetic_test
+    source: ISSUES 85; deliberately incomplete time course
+  signal_per_uM:
+    value: 137.0
+    unit: arbitrary_signal/uM
+    status: synthetic_test
+    source: test_fit_fw pre-audit scale case
+  baseline:
+    value: 0.2
+    unit: arbitrary_signal
+    status: synthetic_test
+    source: ISSUES 85 blank correction check
+  sample_count:
+    value: 40
+    unit: count
+    status: numerical_setting
+    source: ISSUES 86 ensemble smoke test
+  seed:
+    value: 7
+    unit: dimensionless
+    status: numerical_setting
+    source: ISSUES 86 reproducibility
+  relative_tolerance:
+    value: 0.01
+    unit: fraction
+    status: numerical_setting
+    source: Synthetic parameter recovery tolerance
+  dilute_feed:
+    value: 1.0e-20
+    unit: uM
+    status: synthetic_test
+    source: ISSUES 86 cancellation regression

@@ -1,6 +1,11 @@
 # Part III — Gold biorecovery chain. Source: model.md v3.0 section 7.
-# Values and status text transcribed verbatim. Nothing corrected.
-# Unit system: uM, hours, g/L.
+# Values and status text transcribed verbatim, EXCEPT where marked
+# "adopted_from_part_II" below. Unit system: uM, hours, g/L.
+#
+# DECISION 2026-08-10: Part II is the authority for every protein-model
+# quantity across the whole chain. Where Part II and Part III disagreed,
+# Part II's value is now used and the Part III value is kept beside it as
+# `superseded`. One deliberate exception: K_Au. See ISSUES.md items 1 and 2.
 
 meta:
   part: III
@@ -10,118 +15,1217 @@ meta:
   time_unit: h
 
 V1_capture:
+  whole_cell_capacity:
+    value: null
+    unit: umol/g dry cells
+    status: unmeasured_in_project_matrix
+    source: "ISSUES 91; requires a whole-cell isotherm and phase accounting"
+    meaning: Total empirical whole-cell capture capacity; not inferred from the expression site count
+  lambda_D:
+    value: null
+    unit: uM^-1.h^-1
+    status: unmeasured
+    source: null
+    meaning: Death coupling for damage D measured in uM
+    note: ISSUES 73 and 88. The source formula is dimensionally invalid; do not infer a replacement.
+    superseded:
+      expression: mu*k_rep0/A_tox
+      reason: Gives uM^-1.h^-2, incompatible with the biomass rate.
   mu:
-    value: 0.70
-    status: standard E. coli
-  Xmax:
+    value: 1.2
+    meaning: Specific growth rate of the capture culture
+    source: null
+    unit: h^-1
+    status: adopted_from_part_II
+    superseded:
+      value: 0.70
+      status: standard E. coli
+    note: >-
+      Part II runs its expression cascade at mu = 0.02 min^-1 = 1.2 /h,
+      doubling time 34.7 min. Growth dilution is 80% of the loss from the
+      surface-protein pool, so the two documents must agree on this or their
+      site counts cannot be compared. See ISSUES.md item 24.
+  X_max:
+    descriptive_name: capture_biomass_concentration_g_per_L
     value: 5.0
     unit: g/L
-    status: standard E. coli
+    range: [2.8, 20.4]
+    meaning: Carrying capacity of the capture vessel, logistic growth
+    status: design_choice
+    note: >-
+      Renamed from Xmax on 2026-08-11. Every document and src/ already used
+      X_max; only this file did not. ISSUES.md item 26 argues this value is
+      26x below published E. coli densities.
+      SOURCED 2026-08-21. It was status "standard E. coli" with source null,
+      which is not a status and not a source. THIS IS THE LARGEST LEVER IN THE
+      WHOLE MODEL: 8,713x on end-to-end gold in the section 8 tornado, against
+      799x for the next one. It had no citation.
+      IT IS A CHOICE OF MEDIUM AND VESSEL, hence design_choice. The band is
+      what flasks are published to reach, the same ladder as reagent_arm.X_cap:
+      LB              OD600 up to 7      2.8 g/L
+      TB, ZYM-5052    OD600 30           8.1 g/L
+      EnBase, UY flask OD600 73-78      19.7-21.1 g/L
+      5.0 sits between LB and Terrific Broth and is not identified with any
+      published medium. It is a scoping value.
+      BEYOND THE BAND IS A FERMENTER, not a flask. Fed-batch E. coli is
+      published at 128-148 g/L; section 8.4 uses 130 to show that biomass, not
+      display density, is the larger lever on capture. Nothing in that section
+      is costed.
+    source: >-
+      Sezonov, Joseleau-Petit & D'Ari 2007, J Bacteriol 189(23):8746-8749, for
+      the LB ceiling of OD600 7; Ukkonen et al. 2011, Microb Cell Fact 10:107,
+      for the measured shake-flask dry cell weights of 8.1, 10.3 and
+      19.7-21.1 g/L. SOURCES.md S40 and S41
   X0:
     value: 0.05
     unit: g/L
+    meaning: Inoculum biomass at the start of capture
     status: standard E. coli
-  m:
+    source: null
+  k_maint:
     value: 0.005
+    unit: h^-1
+    meaning: Maintenance loss of biomass, the -m*X term in section 2
     status: standard E. coli
+    note: >-
+      Renamed from m on 2026-08-11. The was/now table in docs/EQUATIONS.md
+      announced this rename on 2026-08-10 but it was never applied here.
+      Part II uses m for mRNA, which is the collision the rename removes.
+    source: null
   q_max:
-    value: 4.4
+    scope_2026_09_07: >-
+      ISSUES 91: single Au per accessible GolB-site inventory, not a measured
+      saturation capacity for all whole-cell gold accumulation. S76 reports
+      larger whole-cell loading under different conditions; do not equate the quantities.
+    descriptive_name: single_occupancy_capacity_umol_per_g
+    value: 0.0913
+    meaning: Gold capacity per gram of dry cells
+    source: null
     unit: uM/(g/L)
-    sweep: [0.33, 4.4]
-    status: "may be 5-13x optimistic vs published display ceiling"
-    flag: warning
+    sweep: [0.0913, 0.1961]
+    status: adopted_from_part_II
     joint: "JOINT 2 — supplied by params/expression.yaml via interfaces.qmax_from_expression"
-  K_D:
-    value: 0.1
+    derivation: >-
+      Part II cascade at mu = 1.2 /h gives 23,301 active sites per cell.
+      23301 x 2.36e12 cells/g / 6.022e23 x 1e6 = 0.0913 uM per (g/L).
+    note: >-
+      CHANGED 2026-08-19 from 0.0108 with Part II's copy number, N = 20 -> 300.
+      THIS VALUE IS NOT INDEPENDENT. It is Part II's A* pushed through
+      interfaces.qmax_from_expression, and
+      tests/test_interfaces.py::test_qmax_is_part_II_pushed_through_joint_2
+      recomputes it from params/expression.yaml every run. If Part II moves and
+      this does not, that test fails. It was added because on 2026-08-19 Part
+      II moved and this did not, and the report carried both numbers at once.
+      ISSUES.md item 62.
+    superseded_2026_08_19:
+      value: 0.0108
+      reason: >-
+        Part II's cascade at N = 20, the pBR322-like assumption. Retired when
+        the wet lab confirmed a pUC-type high-copy backbone for the GolB
+        display construct. ISSUES.md item 61.
+    superseded_2026_08_11:
+      value: 0.0163
+      reason: >-
+        Used cells_per_g = 3.57e12, a slow-growth value, for a culture running
+        at a 35 min doubling. ISSUES.md item 33. The Part II adoption decision
+        of 2026-08-10 is unchanged; only the conversion constant moved.
+    superseded:
+      value: 4.4
+      sweep: [0.33, 4.4]
+      status: "assumed; may be 5-13x optimistic vs published display ceiling"
+      note: >-
+        Neither an isotherm nor a shown calculation, confirmed by the author
+        on 2026-08-10. Requires 742,225 sites/cell against a physical anchor
+        ceiling of 50,000. See ISSUES.md item 2.
+    engineering_target:
+      value: 0.1961
+      status: design_anchor_not_a_physical_ceiling
+      superseded_2026_08_11:
+        value: 0.2964
+        reason: same cells_per_g correction, ISSUES.md item 33
+      note: >-
+        Every one of Part II's 1e5 surface anchors occupied, times f = 0.5,
+        is 50,000 active sites per cell. That is 2.15x above the value in
+        use, not the 18x it was before 2026-08-19. Filling every remaining
+        anchor is worth a factor of two and nothing more. Do not use it as a
+        prediction.
+      not_a_hard_ceiling: >-
+        [S29] Jose & Meyer 2007 says autodisplay exports "more than 100,000"
+        molecules per cell, so 1e5 is a demonstrated FLOOR, not a physical
+        limit. This target is a design anchor and could be exceeded. The
+        earlier status physical_ceiling_not_yet_achieved was wrong.
+        See ISSUES.md items 2 and 26.
+  K_Au:
+    descriptive_name: gold_dissociation_constant_uM
+    value: 0.7
+    meaning: GolB-gold dissociation constant
+    source: S78
     unit: uM
-    sweep: [1.0e-4, 0.1]
-    status: "insensitive (PRCC approx 0); bounded by CXXC proxies"
+    sweep: [0.2, 1.15]
+    status: "literature proxy from a purified GolB-based sensor; not measured in thiosulfate leachate"
+    decision_2026_09_18: >-
+      Adopt 0.7 uM, the wild-type GolSeN dissociation constant fitted from a
+      ligand-saturation curve. This is the closest published apparent K_d with
+      the same mathematical meaning as this model. It uses a soluble
+      ECFP-GolB-Venus construct and HAuCl4 in MOPS, not surface-displayed GolB
+      in gold-thiosulfate leachate, so it remains a transferable proxy rather
+      than a project-matrix measurement. The 0.2 to 1.15 uM sweep is the range
+      reported for GolSeN variants in the same study. See ISSUES.md item 1.
+    superseded_2026_09_18:
+      value: 0.1
+      status: unmeasured proxy
+      reason: >-
+        Bounded from CXXC analogues but had no direct source and represented
+        free Au(I)-thiol chemistry rather than an apparent GolB binding curve.
+    superseded_status_2026_09_06: "insensitive (PRCC approx 0); bounded by CXXC proxies"
     conflict: "Part II lists K_d = 10 uM placeholder. See ISSUES.md item 1."
+    superseded_decision_2026_08_10: >-
+      DELIBERATELY NOT adopted from Part II. Part II's 10 uM carries the
+      status "placeholder -- no clean experimental K_d". This 0.1 uM is
+      bounded by CXXC proxies and is the later value. Adopting Part II here
+      would replace a proxy-bounded number with an admitted placeholder.
+      This is the one exception to the adopt-Part-II decision.
   k_on:
     value: 1.0
-    status: "unsourced; only K_D matters"
+    unit: uM^-1.h^-1
+    meaning: Association rate for gold onto a GolB site
+    status: "sourced 2026-08-24; the equilibrium still depends only on K_Au"
+    source: >-
+      Tsuruta 2004, J Gen Appl Microbiol 50(4):221-228, doi:10.2323/jgam.50.221,
+      Fig. 5: gold(III) biosorption onto resting Pseudomonas maltophilia fitted
+      as Q = Qe[1 - exp(-(i*t + j))] with i = 0.0201 /min, j = 2.78 and
+      Qe = 329 umol/g dry cells, at 50.5 uM Au and 0.15 g/L cells. Their
+      loading leaves 1.15 uM free at equilibrium, and the relaxation rate of
+      this model's binding equation, k_on*(Au + S0 - 2*Ceq) + k_off, then gives
+      k_on = 1.05 uM^-1 h^-1. SOURCES.md S57.
+    note: >-
+      THE PLACEHOLDER WAS RIGHT, WITHIN 5 %. It had stood at 1.0 unsourced.
+      Two limits on the anchor: the fit's j = 2.78 means 93.8 % of the load is
+      already bound at t = 0, so i describes the slow tail and this k_on is a
+      FLOOR, not a best estimate; and the measurement is Au(III) chloride at
+      pH 3 on wild-type cells, not Au(I) thiosulfate at pH 9-10 on a displayed
+      protein. Corroborated from a second direction by Tafakori et al. 2017
+      (SOURCES.md S58), where surface-engineered E. coli reaches adsorption
+      equilibrium in 40 min.
   A_tox:
     value: 250
+    meaning: Soluble gold at which damage becomes significant
     unit: uM
     pessimistic: 30
     status: "LB regime; two sources agree on ~30 uM onset"
+    source: >-
+      SOURCED 2026-08-24. Munoz-Villagran et al. 2020, Biol Res 53:26,
+      doi:10.1186/s40659-020-00292-5: MIC of Au(III) for aerobic E. coli in LB
+      at 37 C is 250 uM. SOURCES.md S54.
+    note: >-
+      THE MIC AND THE ONSET ARE DIFFERENT NUMBERS and this file carries both.
+      S54 sees no effect on growth at 7.8-15.6 uM and an extended lag at
+      31.2-125 uM, so damage begins about 8x below the MIC; Wiesemann et al.
+      2017, AEM 83(23):e01679-17, put the Au(III) IC50 for C. metallidurans at
+      18.7-25.8 uM (SOURCES.md S55). The `pessimistic` 30 is that onset.
+      BOTH SOURCES ARE Au(III). We deliver Au(I) thiosulfate and no MIC for
+      that species is published, so the direction of the error is unknown.
   k_dam:
     value: 1.0
-    status: "unsourced; k_dam/A_tox non-identifiable --- only the ratio is determined"
+    unit: h^-1
+    meaning: Damage accrual rate at saturating gold
+    status: "scale-setting; k_dam/A_tox non-identifiable --- only the ratio is determined"
+    source: >-
+      NOT MEASURABLE SEPARATELY. No published rate exists for gold damage
+      accrual in E. coli. 1.0 h^-1 is a scale for D, which is dimensionless
+      and defined only up to this constant; what carries the biology is the
+      ratio k_dam/A_tox, and A_tox is sourced above. SOURCES.md S54, S55.
   k_rep0:
     value: 0.1
-    status: "unsourced; k_dam/A_tox non-identifiable --- only the ratio is determined"
+    unit: h^-1
+    meaning: Repair rate of damaged cells
+    status: "an order of magnitude slower than the nearest measured analogue"
+    source: >-
+      SOURCED 2026-08-24 against an analogue, not against gold. LaVoie &
+      Summers 2018, BMC Genomics 19:52, doi:10.1186/s12864-017-4413-z: E. coli
+      recovering from a sublethal soft-metal thiol insult shows 10-30 min of
+      growth stasis and is back at its pre-exposure growth rate by 60 min.
+      SOURCES.md S56.
+    note: >-
+      THAT IS ABOUT 1 h^-1, TEN TIMES THIS VALUE. The value is not changed,
+      for two reasons: k_dam and k_rep0 are not separately identifiable, and
+      nothing in src/ integrates the damage equation --- eta_capture is the
+      equilibrium quadratic alone. Raise it only together with k_dam, and only
+      once something reads these two.
   w:
     value: 1.0
+    unit: dimensionless
+    meaning: Weight of damage on the effective site count
+    source: null
     status: "insensitive (PRCC -0.02)"
   Au_feed:
     value: null
-    range: [10, 20]
+    range: [0.4, 0.8]
+    superseded_range: [1, 2]
+    superseded_range_original: [10, 20]
+    conditional_on: q_max.engineering_target
+    revised_2026_08_10: >-
+      The 10-20 uM window was chosen when q_max = 4.4 gave a capacity ceiling
+      of 22 uM. Adopting Part II dropped the ceiling by more than two orders
+      of magnitude, so the window was revised to 1-2 uM, conditional on the
+      display reaching its engineering target.
+    revised_2026_08_11: >-
+      Correcting cells_per_g to the operating growth rate (ISSUES.md item 33)
+      moved the engineering target from 0.2964 to 0.1961, so the ceiling at
+      that target fell from 1.48 uM to 0.98 uM. A 1-2 uM window no longer fits
+      underneath it. The window is now 0.4-0.8 uM, whose top is 0.82 of the
+      ceiling, matching the 20/22 = 0.91 headroom Part III originally used.
+      Note the 1-2 uM window set on 2026-08-10 was ALREADY above its own
+      ceiling of 1.48 uM at the top end; this correction fixes that too.
+      Today's ceiling is 0.0539 uM, so there is still NO feed concentration at
+      which capture is not capacity-limited. See ISSUES.md items 26 and 33.
     unit: uM
-    status: "input from out-of-scope leaching model"
+    meaning: Dissolved gold entering capture
+    status: supplied_by_part_I
+    superseded_status: "input from out-of-scope leaching model"
     joint: "JOINT 1 — supplied by params/leach.yaml via interfaces.au_feed_from_leach"
+    source: params/leach.yaml
 
 elution:
   phi:
-    value: 0.13
-    sweep: [0.05, 0.30]
-    status: "87% desorption, protein biosorbent + 1 M thiourea. May be formulation-dependent (95-98% with additives)"
-  k_max:
-    value: 2.0
+    descriptive_name: nonelutable_gold_fraction
+    value: 0.03
+    unit: dimensionless
+    meaning: Fraction of gold that stays bound after elution
+    source: S60
+    sweep: [0.03, 0.30]
+    status: "97% endpoint in the same acid-thiourea study used for k_elute"
+    note: >-
+      Adopted 2026-09-18 so the release ceiling and rate come from one
+      internally consistent study. S60 reports up to 97% desorption using
+      0.1 M thiourea in 0.1 M sulfuric acid at 50 C and 1 g sorbent/L.
+      The sorbent was a porphyrin polymer, not GolB, so this remains a
+      transferred working value until the comb time course is measured.
+    superseded:
+      value: 0.13
+      source: S59
+      reason: >-
+        The 87% protein-sorbent endpoint was previously combined with an
+        S60-derived rate, creating a hybrid operating scenario. It remains a
+        useful pessimistic comparison but is no longer the reference ceiling.
+  kinetic_model:
+    value: PFO
+    unit: dimensionless
+    meaning: >-
+      Which rate law elution follows. PFO is the first-order release model in
+      recovery_chain.eta_elute. PSO is retained only for comparison.
+    status: provisional_literature_proxy
+    note: >-
+      Adopted 2026-09-18. No GolB elution time course establishes a reaction
+      order. First order is the simplest release model and keeps its rate
+      independent of initial gold loading. Fit both candidate laws to the
+      project time course before treating either as validated. ISSUES.md 47.
+    source: S60
+    superseded:
+      value: PSO
+      reason: >-
+        Used from 2026-08-16 to 2026-09-18. It was transferred from adsorption
+        literature without a GolB desorption time course, and its apparent
+        rate depended on initial loading.
+  k_elute:
+    descriptive_name: first_order_elution_rate_per_h
+    value: 0.22
     unit: h^-1
-    status: "at 1 M thiourea; design lever via [TU]"
+    meaning: >-
+      First-order rate constant for release of elutable gold from the comb.
+    status: "literature-derived lower-bound proxy; not measured on GolB"
+    range: [0.22, 3.0]
+    note: >-
+      Adopted 2026-09-18. S60 reports more than 90% release after 12 h and a
+      97% final ceiling for acid-thiourea elution from a porphyrin polymer.
+      Under eta/eta_max = 1-exp(-k*t), the conservative 90% point gives
+      k = -ln(1-0.90/0.97)/12 = 0.219 h^-1, rounded to 0.22 h^-1. This is a
+      lower bound. S60 also supplies the reference ceiling phi = 0.03. S61 reaches
+      quantitative elution within 60 min on immobilised bacteria; 3.0 h^-1
+      corresponds to 95% of the ceiling in 1 h and is only a scenario bound.
+      ISSUES.md items 28 and 47.
+    source: S60
+    superseded:
+      value: 2.0
+      range: [1.1, 19.0]
+      source: [S60, S24, S61, S62]
+      reason: >-
+        Retired 2026-09-18 with the PSO rate law. It was an apparent PSO rate
+        and cannot be carried unchanged into a first-order model.
+  TU:
+    value: 0.1
+    unit: M
+    meaning: Thiourea concentration in the reference acid-thiourea eluent
+    status: adopted_literature_operating_condition
+    note: "Used with 0.1 M sulfuric acid at 50 C and 1 g sorbent/L."
+    source: S60
+  sulfuric_acid:
+    value: 0.1
+    unit: M
+    meaning: Sulfuric acid concentration in the reference eluent
+    status: adopted_literature_operating_condition
+    source: S60
+  elution_temperature:
+    value: 50.0
+    unit: degC
+    meaning: Temperature of the reference elution
+    status: adopted_literature_operating_condition
+    source: S60
+  elution_solid_liquid_ratio:
+    value: 1.0
+    unit: g sorbent/L
+    meaning: Sorbent loading in the reference elution
+    status: adopted_literature_operating_condition
+    source: S60
+  n_TU:
+    value: null
+    unit: dimensionless
+    meaning: >-
+      Exponent in k_elute = k*[TU]^n_TU, how strongly elution speed follows
+      eluent concentration. Used in docs/EQUATIONS.md but never given a value.
+    status: unmeasured
+    note: >-
+      Added 2026-08-11 by the audit. The equation was in EQUATIONS.md with no
+      parameter behind it. It cannot be filled until the eluent is chosen,
+      ISSUES.md item 28. Until then k_elute is used directly at TU = 0.1 M and
+      the exponent never fires.
+    source: null
 
 reduction:
-  k_red:
+  nu_rech:
+    descriptive_name: donor_molecules_per_protein_recharge
+    value: 1.0
+    unit: mol donor per mol protein recharged
+    status: stoichiometric_assumption
+    source: "ISSUES 90; two-electron bookkeeping, not measured recharge yield"
+  retired_k_donor:
     value: null
+    unit: uM^-1.h^-1
+    meaning: >-
+      RETIRED 2026-08-16. Electron-donation rate constant for the separate
+      v_donor branch, which no longer exists. The model now follows standard
+      Finke-Watzky with the donor carried by mass action, so there is no second
+      branch to take a minimum over. Kept because the record is not deleted,
+      AGENTS.md rule 6, and because the literature bracket below is still the
+      right starting point if anyone reinstates an explicit donor step.
+    status: retired
+    note: >-
+      Was k_red until 2026-08-16, then k_donor, now retired. It never affected
+      a result: v_part was the smaller branch by about 57,000x at t = 0 and the
+      vessel never held enough gold to reverse that, which is what the old
+      status "insensitive given F-W" meant. ISSUES.md item 50.
+    source: null
     range: [0.0072, 158]
-    unit: uM^-1.h^-1
     scale: log
-    status: "literature thiol-Au bracket; insensitive given F-W"
-  k1:
-    value: 5.0e-5
+    range_status: "literature thiol-Au bracket; insensitive given F-W"
+  seeding_on:
+    value: false
+    meaning: >-
+      Start the reduction vessel with preformed gold nanoparticles instead of
+      an empty solid pool. Off by default, so nothing published before
+      2026-08-20 moves.
+    source: null
+    status: switch
+    note: >-
+      Finke-Watzky is autocatalytic, so the vessel spends its first hours
+      building the catalyst it needs. t_ind = 1/(k_grow*Au_aq) is 13.6 h at
+      the gold elution delivers, against a 24 h batch. Seeding removes that
+      induction period. ISSUES.md item 64.
+  seed_frac:
+    value: null
+    unit: dimensionless
+    meaning: >-
+      Seed gold as a FRACTION of the dissolved gold the vessel is charged with.
+      Required when seeding_on is true; there is no default, because no seeding
+      experiment has been run and a guess here would set the answer.
+    source: null
+    status: unmeasured
+    flag: warning
+    modelled_band: [0.01, 0.10]
+    note: >-
+      The band is what the model was explored over, NOT a measurement. At a 4x
+      concentration and 24 h it spans 92% to 99.5% conversion. Below about
+      0.1% the seed does not shorten the induction usefully; above about 100%
+      the vessel holds more seed than product and the exercise is pointless.
+      One seeded reduction with and without seed would replace this entry.
+  # -------------------------------------------------------------------------
+  # THE MECHANISM WAS CHECKED 2026-08-21 AND KEPT. ISSUES.md item 67.
+  #
+  # Finke-Watzky was challenged in print -- "Particle Size Is a Primary
+  # Determinant for Sigmoidal Kinetics of Nanoparticle Formation: A 'Disproof'
+  # of the F-W Mechanism", Chem. Mater. 2019 -- and the challenge was answered
+  # in print, Chem. Mater. 2020. F-W remains the standard model for sigmoidal
+  # nanoparticle formation, and the biogenic gold literature describes the
+  # same picture: reduction to Au(0), cluster formation, autocatalytic growth.
+  #
+  # The field's own extension, Mechanism-Enabled Population Balance Modelling,
+  # ADDS a third step to F-W rather than replacing it, and what it buys is the
+  # PARTICLE SIZE DISTRIBUTION. This repository does not need that: physical
+  # recovery went out of scope on 2026-08-21 and conversion is the
+  # deliverable. Two steps is the right level for the question being asked.
+  #
+  # THE RISK IS NOT THE MECHANISM. IT IS THE TWO CONSTANTS BELOW.
+  # -------------------------------------------------------------------------
+  k_nuc:
+    descriptive_name: effective_nucleation_rate_per_h
+    audit_2026_09_06: >-
+      ISSUES 84 and 88. Retained as a reference scenario, not validated
+      particle nucleation. MerA electron transfer is not the same mechanism,
+      protein, precursor or medium. The full range is a scenario range, not
+      measured uncertainty. Effective constants are held fixed in the ODE;
+      varying E_tot does not implement an enzyme concentration scaling.
+    value: 0.96
+    meaning: Finke-Watzky nucleation rate
+    superseded:
+      value: 5.0e-5
+      reason: >-
+        Retired 2026-08-24. 5.0e-5 was a CHEMICAL nucleation rate, transferred
+        from ascorbate and cinnamon-extract fits and scaled for reductant. In
+        this vessel nucleation is not spontaneous chemistry: the reductase
+        performs it. Scaling from the first MEASURED enzyme constants for gold
+        reduction, k_nuc = (k_cat/K_M)*E_tot = 0.335*2.857 = 0.96 /h. That is
+        19,000x the retired value and it moves t_95 at the delivered gold from
+        139 h to 3.1 h. SOURCES.md S74, ISSUES.md items 80 and 82.
+    source: >-
+      Mechanism from Watzky & Finke 1997, kept after the 2019 challenge and
+      the 2020 Response. Value anchored on two gold systems, scaled for
+      reductant; see the note. SOURCES.md S51 and S52
     unit: h^-1
-    status: "weakly calibrated --- joint #1 driver"
+    range: [5.0e-5, 14.0]
+    status: sourced_by_proxy
     flag: warning
-  k2:
-    value: 0.2
+    superseded_range:
+      range: [5.0e-6, 8.6e-4]
+      reason: >-
+        Retired 2026-08-24 with the value. The old band was chemical
+        nucleation scaled for reductant. The new band is enzymatic: its floor
+        is the retired chemical value, 5.0e-5, and its ceiling is the
+        engineered MerA variant of SOURCES.md S74, (k_cat/K_M)*E_tot =
+        4.90*2.857 = 14.0 /h. The value in use, 0.96, is the WILD TYPE of the
+        same study and sits low in the band on purpose.
+    note: >-
+      BAND AND ANCHOR ADDED 2026-08-21. The value is unchanged and is now the
+      conservative end of a literature-anchored band instead of a bare guess.
+      TWO GOLD SYSTEMS AGREE, and neither is this one. Cinnamon-extract
+      reduction of Au(III) fits Watzky-Finke with k1 = 0.0056 /min at 40 C,
+      which is 0.0858 /h corrected to 25 C on its own reported activation
+      energy of 70.6 kJ/mol. Ascorbate-PVP reduction of HAuCl4, refitted in
+      the ACS Omega critical analysis, gives k1 = 2.19e-5 /s = 0.0788 /h.
+      Two independent chemistries, agreeing at about 0.08 /h.
+      WHY 5e-5 SURVIVES THAT. k1 is pseudo-first-order and absorbs the
+      REDUCTANT concentration. Those systems carry millimolar reductant;
+      this one carries about 9.2 uM of electrons from Rech_0 at 2 e-, roughly
+      a thousandfold less. Scaling 0.086 /h down by 1000 gives 8.6e-5 /h,
+      within a factor of two of the 5e-5 already in use. That agreement is
+      the reason for keeping the value, and it is an argument, not a
+      measurement. The band runs from a tenth of the value in use to the
+      reductant-scaled published estimate.
+      IT MATTERS LESS THAN IT LOOKS. Seeding substitutes for this constant. k_nuc only ever supplies the first
+      particles; once Au_s is non-zero the k_grow term dominates. That is why a
+      1% seed and a 100x rise in k_nuc buy about the same thing, and why the
+      seed is the cheaper of the two to obtain. ISSUES.md item 64.
+      SEARCHED 2026-08-21. No fit exists for PROTEIN-mediated gold reduction,
+      which is this system. What does exist is gold with chemical reductants,
+      and that is what the anchors above are. The literature states plainly
+      that these constants are system-dependent and fitted per curve, so
+      everything here is transfer with an argument attached, never a value
+      taken off a shelf.
+      AND THEY MAY NOT BE BORROWED ACROSS MODEL FAMILIES. Fitting the same
+      data with the classic KJMA/Avrami model gives radically different rate
+      constants for the same conditions. A rate constant means nothing apart
+      from the mechanism it was fitted with.
+  k_grow:
+    descriptive_name: effective_autocatalytic_growth_rate_per_uM_h
+    audit_2026_09_06: >-
+      ISSUES 84. The current value and range are the fields below. Historical
+      notes that call recentring pending are superseded by the 2026-08-24
+      change. The interval is not a calibrated probability distribution.
+    value: 0.082
+    meaning: Finke-Watzky autocatalytic growth rate
+    source: >-
+      Mechanism from Watzky & Finke 1997, kept after the 2019 challenge and
+      the 2020 Response. Band top from the ascorbate-PVP gold fit; see the
+      note. SOURCES.md S51 and S52
     unit: uM^-1.h^-1
-    status: "weakly calibrated --- joint #1 driver"
+    range: [3.2e-3, 2.1]
+    status: sourced_by_proxy
     flag: warning
+    superseded:
+      value: 0.2
+      range: [0.02, 2.1]
+      reason: >-
+        VALUE RETIRED 2026-08-24. 0.2 was the log-centre of the OLD band and
+        sat 2.4x above the log-centre of the anchored one. Recentred to 0.082,
+        the decision left open on 2026-08-21. With k_nuc now enzyme-scaled the
+        whole 656-fold band moves t_95 by only 1.5x, so this constant is no
+        longer the joint #1 driver. ISSUES.md item 82.
+        The old band's floor, 0.02, was a bare "ten times either way" guess.
+        Retired 2026-08-21 when the floor acquired a citation: a purified
+        Au(III) reductase, sixty times slower again.
+    note: >-
+      BOTH ENDS ANCHORED 2026-08-21. The band widened from 105-fold to
+      656-fold and its floor fell sixtyfold.
+      THE VALUE DID NOT MOVE, AND THAT IS NOW A BIAS TO DECLARE. 0.2 was the
+      log-centre of the OLD band. The log-centre of the anchored band is
+      0.082, so the value in use sits 2.4x ABOVE centre, on the fast side.
+      It was kept because moving it re-derives eleven pinned tests and every
+      published reduction figure, and because the robust design below is
+      sized on the BAND rather than on the value, so the bias does not reach
+      the recommendation. RECENTRING TO 0.082 IS AN OPEN DECISION FOR THE
+      TEAM; it makes every conversion figure in section 6.3 slightly worse
+      and changes no conclusion.
+      THE FLOOR IS AN ENZYME AND IT IS THE CLOSEST PUBLISHED ANALOGUE THERE
+      IS. GolR, a purified Au(III) reductase from Erwinia sp. IMH, reduced
+      about 67 % of 2 mM Au(III) in 2 h at 30 C and pH 7 with 1 mM NADH.
+      Fitting that single endpoint through this repository's own reduction
+      model gives k_grow = 3.2e-3 uM^-1.h^-1, and a plain Finke-Watzky fit
+      gives 0.9e-3 to 3.7e-3 depending on the k_nuc assumed. A PURIFIED
+      ENZYME IS ABOUT SIXTY TIMES SLOWER THAN THE VALUE THIS FILE CARRIED.
+      THE CEILING IS CHEMISTRY. Ascorbate-PVP reduction of HAuCl4 gives about
+      2.1 uM^-1.h^-1, six hundred times faster than the enzyme. That is the
+      expected direction: a small molecule in large excess against a protein
+      handing over electrons one at a time.
+      WHY THE GolR NUMBER CAN BE TRUSTED AS FAR AS IT GOES. Its own electron
+      ledger closes: 67 % of 2 mM Au(III) at 3 e- is 4 mM of electrons, and
+      1 mM NADH plus 1 mM GolR at 2 e- each is exactly 4 mM. Running the same
+      conditions at 1 uM protein instead caps conversion at 4 %, so the
+      paper's 1 mM is not a typographical error.
+      AND WHERE IT STOPS. It is ONE endpoint, not a time course, so k_nuc and
+      k_grow cannot be separated from it; the fit above assumes this file's
+      k_nuc. It was measured at 2 mM gold and is applied here at 0.37 uM, five
+      thousandfold lower, which is exactly the extrapolation the 2019 particle
+      size critique warns about. It is a different protein from ours.
+      ISSUES.md item 67, SOURCES.md S53.
+      THE CEILING IN DETAIL. Ascorbate-PVP reduction of HAuCl4, refitted in
+      the ACS Omega critical analysis, gives k2 = 0.234 /s against a
+      NORMALISED [A]0 = 1.00,
+      so k2*[A]0 = 842 /h at full precursor. Turning that into this file's
+      units needs the precursor concentration, which that paper does not
+      state; at the 0.4 mM typical of such preparations it is 2.1 uM^-1.h^-1.
+      THE 0.4 mM IS AN ASSUMPTION OF OURS, not a number from the paper, and
+      the answer is linear in it. Treat 2.1 as an order of magnitude.
+      THE BAND SPANS THE WHOLE STAGE, 656-fold. At the enzymatic floor the
+      delivered 0.367 uM has a crossover time of 852 h, thirty-six days, and
+      converts 0.1 % in a day. At the chemical ceiling it converts 99.9 % in a
+      day with no concentration step and no seed. The value in use is the
+      log-centre, 0.082, which gives a crossover of 33 h and 0.2 % in a day.
+      THE LOG-CENTRE IS THE NEUTRAL CHOICE for a constant spanning nearly
+      three orders of magnitude; the arithmetic mean would be 1.05 and would
+      quietly sit beside the chemical ceiling.
+      IT IS STILL THE LARGEST UNCONSTRAINED QUANTITY IN THE MODEL, 799x in the
+      section 8 tornado. NO SINGLE CONVERSION FIGURE FROM THE REDUCTION STAGE
+      MAY BE QUOTED WITHOUT THIS BAND.
   k_ox:
+    descriptive_name: protein_oxidation_rate_per_h
     value: 0.02
+    meaning: Oxidation of reduced protein to its oxidised form
+    superseded_meaning:
+      value: Re-oxidation of Au(0) back to solution
+      reason: ISSUES 70 and 88; the implemented sink is in E_red, not Au_s.
+    source: null
     unit: h^-1
     status: "unsourced; measurable (air vs N2)"
   k_rech:
+    descriptive_name: protein_recharge_rate_per_uM_h
     value: 0.1
-    status: insensitive
-  K_i:
+    unit: uM^-1.h^-1
+    meaning: Second-order rate constant for dithionite recharging spent reductase
+    source: null
+    status: "unmeasured proxy; sensitivity is scenario-dependent"
+    superseded_status_2026_09_06: insensitive
+    note: >-
+      UNIT CORRECTED 2026-08-24. It read h^-1, which does not balance. The code
+      uses v_rech = k_rech*E_ox*Rech, and E_ox and Rech are both in uM, so the
+      constant must carry uM^-1.h^-1 for v_rech to come out in uM/h like every
+      other term in dE_red/dt. The VALUE is unchanged and no result moves; the
+      label was wrong, the same class of defect as ISSUES.md items 70 and 72.
+      Why it is insensitive: at E_tot = 2.86 uM and Rech_0 = 50 uM the term
+      reaches 14.3 uM/h, against a gold demand of 5.5 uM of protein turnover
+      over the whole 96 h batch. Recharging is never the limiting step at any
+      value within two orders of magnitude of this one.
+  K_inh:
+    descriptive_name: gold_inhibition_constant_uM
     value: 500
-    status: insensitive
-  R0:
-    value: null
-    range: [10, 1000]
     unit: uM
-    status: "lysis-dilution choice, not a literature value"
+    meaning: Half-inhibition concentration in the reduction step
+    source: null
+    status: "unmeasured proxy; sensitivity is scenario-dependent"
+    superseded_status_2026_09_06: insensitive
+  Rech_0:
+    descriptive_name: initial_recharge_donor_uM
+    value: 50.0
+    meaning: >-
+      Initial pool of the small-molecule reductant that recharges the
+      reductase. Sodium dithionite, added as a reagent. Renamed from R0
+      2026-08-16; Rech matches k_rech and v_rech.
+    source: >-
+      Reagent and identity from S35; the 50 uM quantity is this project's own
+      design choice, adopted 2026-08-21. S35's own 4.6 uM is in superseded.
+    range: [4.6, 1000]
+    unit: uM
+    status: design_choice
+    superseded:
+      value: 4.6
+      status: "from the source recipe; an added consumable, not lysate carryover"
+      reason: >-
+        S35's own recipe: 100 uL of 46 uM into a 1000 uL reaction. Retired as
+        the OPERATING value on 2026-08-21, after the team confirmed the
+        reagent is available, because 4.6 uM cannot carry the electron demand
+        of a concentrated vessel. IT IS STILL THE SOURCE VALUE and anything
+        reproducing S35 must use it, not 50.
+    note: >-
+      S35 methods, "Gold reduction and nanoparticle formation": 100 uL of
+      46 uM sodium dithionite into a 1000 uL reaction, so 4.6 uM final. The
+      dithionite activates the reaction; it is not optional. Each S2O4(2-)
+      carries 2 electrons, so 4.6 uM supplies 9.2 uM of electrons.
+      S35 ran 0.5-10 mM Au(III) at 3 electrons each, needing 1500-30000 uM.
+      Its own supply/demand ratio is therefore 0.6% falling to 0.03%, which is
+      why that work reports colour and TEM and never a conversion. ISSUES.md
+      item 51. The upper end of the range is kept as a design sweep for a
+      dosed process, not as anything S35 demonstrated.
+      RAISED 2026-08-21 FROM 4.6 TO 50 uM, a team decision after reading S35's
+      methods directly: the reagent is not optional there, "the reaction was
+      activated by adding 100 uL sodium dithionite (46 uM)", so the question
+      was never whether to use it, only how much.
+      WHY 50. At the recommended 30x concentration the vessel holds 11 uM of
+      gold. At 4.6 uM the total electron supply is 14.9 uM and the vessel
+      stalls at 82 % -- 168 h and 336 h give the same answer, because it has
+      run out of electrons rather than time. At 50 uM the supply is 105.7 uM
+      and the same vessel reaches 99.95 %.
+      IT IS 8.7 mg PER LITRE. Na2S2O4 is 174.1 g/mol. S35's own 4.6 uM is
+      0.8 mg/L, so this is the same bottle.
+      MORE ENZYME IS NOT A SUBSTITUTE and makes things worse: the rate carries
+      E_red/E_tot, so adding enzyme against a fixed donor pool dilutes the
+      reducing power per molecule. ISSUES.md items 64 and 67.
+    superseded_2026_08_17:
+      status: "lysis-dilution choice, not a literature value"
+      range: [10, 1000]
+      reason: >-
+        Held until 2026-08-17, when S35's methods were read directly. Nothing
+        in S35 carries a reductant over from lysis: the protein is purified
+        first and the dithionite is added afterwards. The old range also
+        excluded the only value the source actually used, 4.6 uM.
+  mediator_0:
+    value: 0.1
+    unit: uM
+    meaning: >-
+      Methyl viologen, the redox shuttle that carries electrons from the
+      dithionite to the reductase in S35.
+    source: S35
+    status: "in the source recipe, absent from every equation in this model"
+    note: >-
+      S35 methods: 100 uL of 1 uM methyl viologen into a 1000 uL reaction, so
+      0.1 uM final. Present in every published run. This model hands Rech
+      straight to E_ox and so assumes the shuttle is instantaneous and free.
+      No rate constant for it exists here. ISSUES.md items 49 and 51.
   nu:
+    descriptive_name: protein_equivalents_per_gold
     value: 0.5
+    unit: mol reductase per mol Au
+    meaning: Reductase spent per gold atom reduced
+    source: S63
     status: "stoichiometric; 0.5 for Au(I), 1.5 for Au(III)"
+    note: >-
+      SOURCED 2026-08-24, and the unit and meaning corrected the same day.
+      They read "mol e- per mol Au" and "electrons required per gold atom",
+      which contradicts the value: Au(I) needs ONE electron, not 0.5. The 0.5
+      is PROTEIN per gold, because the carrier is a disulfide worth two
+      electrons. The code has always used it that way, in
+      dE_red/dt = -nu*v + ..., so no number moves; the label was wrong.
+      S63 supplies the mechanism: Erasmus et al. 2014, Gold Bulletin 47:245,
+      purified this protein and proposed that it reduces Au(III) through an
+      electron shuttle involving a cysteine disulphide bridge. THE PAPER SAYS
+      SPECULATED. There is no structure, no redox titration and no measured
+      electron count, so the entire electron budget of RECOVERY.md 4.3 rests
+      on a proposed mechanism. If the carrier turns out to be single-electron,
+      nu = 1 for Au(I) and the protein-only ceiling halves.
   E_tot:
+    descriptive_name: redox_protein_concentration_uM
     formula: "protein/70000 * 1e6"
     status: "measurable; set by induction"
 
+# ---------------------------------------------------------------------------
+# ARM B, the reagent arm. Added 2026-08-16, ISSUES.md item 48.
+#
+# The source document's section 1 draws two arms converging at reduction: the
+# gold arm, which is modelled end to end, and this one, which was drawn and
+# never built. It grows E. coli carrying the reductase construct, induces,
+# lyses, concentrates the lysate, and mixes it into the eluate.
+#
+# Everything the construct decides is null, because the construct does not
+# exist yet. The mixing algebra below it needs no new parameter and is exact.
+# ---------------------------------------------------------------------------
+reagent_arm:
+  audit_2026_09_06: >-
+    ISSUES 87. Growth dilution is now the actual logistic specific growth.
+    Historical harvest and shortfall notes below are superseded. The old
+    alpha_N_beta band was calibrated using a different stationary loss and
+    is no longer a physical ceiling. Absolute yields and harvest decisions
+    require stationary-phase expression and active-protein calibration.
+  protein_target_g_per_L:
+    value: 0.2
+    unit: g/L
+    meaning: Reducing protein wanted in the V2 vessel after mixing
+    status: design_choice
+    note: >-
+      Was hard-coded in model.ipynb and tests/test_sensitivity.py until
+      2026-08-16. It sets E_tot and therefore the electron ceiling. It is a
+      target we chose, not a measurement.
+    source: null
+  M_r_reductase:
+    value: 70000
+    unit: g/mol
+    meaning: Relative molecular mass of the reducing protein
+    status: assumed
+    note: "Used to turn g/L into uM. Replace when the construct is fixed."
+    source: null
+  # -------------------------------------------------------------------------
+  # ONE PARAMETER, NOT THREE. Restructured 2026-08-20, ISSUES.md item 67.
+  #
+  # alpha, N and beta enter the cascade ONLY as their product. The steady
+  # state is
+  #
+  #     P_c* = alpha * N * beta / ((delta_m + mu) * (delta_c + mu))
+  #
+  # so no measurement of protein can separate them. In the language of
+  # Raue et al. 2009 they are STRUCTURALLY NON-IDENTIFIABLE, and the
+  # prescribed treatment is to lump the group and estimate the lump.
+  #
+  # Carrying them separately was worse than untidy. Each had its own band, and
+  # sampling them independently spread a single number over about 160x. That
+  # is uncertainty this model does not have, on structure it cannot see.
+  #
+  # The three keys below are kept, null, so that nothing reads them by
+  # accident and so the record of what they held survives.
+  # -------------------------------------------------------------------------
+  alpha_N_beta:
+    value: 500.0
+    unit: protein.min^-2.cell^-1
+    meaning: >-
+      The identifiable expression group of the reductase construct, the
+      product alpha * N * beta. Promoter strength times plasmid copy number
+      times translation rate.
+    status: sourced_by_proxy
+    range: [30.0, 4080.0]
+    note: >-
+      ADOPTED 2026-08-20 as 2.5 x 50 x 4.0, the values alpha, N and beta held
+      separately on that day. The number is unchanged; what changed is that it
+      is now one number instead of three, which is what the model can actually
+      see.
+      BOTH ENDS OF THE BAND ARE ANCHORED, and neither is a product of guesses.
+      The floor, 30, is a generic E. coli promoter on a rom-intact pBR322
+      plasmid at the low end of that literature: 0.5 x 15 x 4.0. A T7 vector
+      will not do worse than a generic promoter, so it is a floor rather than
+      a belief. The ceiling, 4080, is where the reductase reaches 50 % of
+      total cell protein, the Studier and Moffatt benchmark for a T7 system.
+      Nothing above it is physically available.
+      IT IS STILL A PROXY. beta is GolB's, the copy number is a measurement of
+      a relative and not of this strain, and the promoter term is an
+      elongation ratio standing in for an initiation rate. Everything the
+      three separate entries said about their weakness is still true of the
+      lump. What is no longer true is the pretence that they are three
+      independent quantities.
+      HOW IT ENTERS THE MODEL. The cascade is run with alpha = this value,
+      N = 1 and beta = 1, which reproduces protein per cell exactly, to 3e-8,
+      because only the product appears. src/reductase.py::cascade_from_lumped.
+      The mRNA series from such a run is rescaled and must not be read.
+      ONE GEL LANE MEASURES IT. Reductase as a fraction of total protein,
+      induced against uninduced, gives P_c* directly and therefore this group.
+    source: >-
+      Lumping follows Raue et al. 2009, Bioinformatics 25(15):1923-1929, on
+      structural non-identifiability. Component anchors: T7 elongation about
+      5x E. coli RNA polymerase, and Studier & Moffatt 1986 for the 50 % of
+      total cell protein ceiling; copy number from Sathiamoorthy & Shin 2012,
+      PLoS ONE 7(10) e47259, 51 +/- 8 for the pBR322-derived pGEX-6p-1
+  alpha:
+    value: null
+    unit: mRNA/min per plasmid copy
+    meaning: Promoter strength of the reductase construct
+    status: not_separately_identifiable
+    note: >-
+      RETIRED 2026-08-20 into alpha_N_beta above. It is not measurable
+      separately from N and beta by anything this model observes, so a value
+      here would be a choice of how to split a product, not a fact. Held null
+      so that nothing reads it. ISSUES.md item 67.
+    superseded:
+      value: 2.5
+      reason: >-
+        Held for part of 2026-08-20 as 5x GolB's 0.5, an elongation ratio
+        standing in for an initiation rate, banded 0.5 to 20.4. The value
+        survives inside alpha_N_beta; only the pretence of separability is
+        gone.
+    source: null
+  N:
+    value: null
+    unit: copies/cell
+    meaning: Plasmid copy number of the reductase construct
+    status: not_separately_identifiable
+    note: >-
+      RETIRED 2026-08-20 into alpha_N_beta above, for the same reason as
+      alpha. THE VECTOR IS STILL WORTH RECORDING: pET-24(+), which carries the
+      pBR322 replicon with rop present, checked on the vector map. That is
+      medium copy, not the pUC-type high copy of GolB's pJUMP24-1A, and it is
+      why the reagent arm cannot borrow GolB's numbers. ISSUES.md item 67.
+    superseded:
+      value: 50
+      reason: >-
+        Held for part of 2026-08-20. 51 +/- 8 measured by qPCR for pGEX-6p-1,
+        the nearest pBR322-derived and rom-intact relative, rounded to 50, and
+        banded 15 to 60. Before that, 40, a mid-range reading of a wide
+        literature, retired the same day when the measurement was found.
+    source: null
+  beta:
+    value: null
+    unit: protein/min per mRNA
+    meaning: Translation rate of the reductase construct
+    status: not_separately_identifiable
+    note: >-
+      RETIRED 2026-08-20 into alpha_N_beta above. It was never given a value
+      of its own; GolB's 4.0 stood in, and it is inside the lump now.
+      ISSUES.md item 67.
+    source: null
+  delta_c:
+    value: 0.005
+    unit: min^-1
+    range: [0.0, 0.0116]
+    meaning: Cytoplasmic decay of the reductase
+    status: sourced_from_the_turnover_literature
+    note: >-
+      SOURCED 2026-08-21, replacing a null that borrowed GolB's 0.005.
+      THE E. COLI PROTEOME IS MOSTLY STABLE. Global turnover measurements find
+      the active degradation constant practically zero for the great majority
+      of proteins during exponential growth under standard conditions, with a
+      rapidly degrading component of 2 to 7 % of cellular protein decaying at
+      a half-life of about one hour. So the band runs from 0.0, a stable
+      protein diluted only by growth, to 0.0116 /min, ln2 over 60 min, a
+      protein in the rapidly degrading class.
+      0.005 IS KEPT, which is a half-life of 139 min. It is GolB's value and
+      sits inside the band, but it is not a measurement of this protein. The
+      honest reading is that the low end is the more likely one and the value
+      is conservative.
+      WHICH WAY IT MATTERS: delta_c sits beside mu in the denominator, and mu
+      is 0.02 /min. At delta_c = 0 the plateau rises about 25 %.
+      ISSUES.md item 67.
+    source: >-
+      Global protein-turnover quantification in E. coli, Nature Communications
+      2024: degradation practically zero for most of the proteome in
+      exponential growth; rapidly degrading component 2-7 % at about 1 h
+      half-life
+  lysis_yield:
+    value: 0.70
+    unit: dimensionless
+    range: [0.50, 0.90]
+    meaning: >-
+      Fraction of cellular reductase that ends up soluble in the supernatant
+      after sonication and 100,000 g for 90 min.
+    status: sourced_from_the_lysis_literature
+    note: >-
+      SOURCED 2026-08-21, replacing a null. A single 15-minute sonication
+      leaves about 30 % of recombinant protein associated with cell debris, so
+      about 70 % is recovered; two consecutive treatments reach about 90 %.
+      0.70 is one pass, 0.90 is two, and 0.50 is the low end for a protein
+      that partitions badly.
+      IT MULTIPLIES THE SHORTFALL, it does not add to it. At 0.70 the 3.0x
+      shortfall becomes 4.2x.
+      IT IS STILL ONE BENCH MEASUREMENT AWAY. Bradford or A280 before and
+      after the spin, on this protein, replaces the whole band.
+      ISSUES.md item 67.
+    source: >-
+      Ultrasonication of E. coli: about 30 % of recombinant protein remains
+      with cell debris after one 15-min treatment, about 90 % global recovery
+      after two, Biotechnology Techniques ultrasonication protocol literature
+  # -------------------------------------------------------------------------
+  # THE ROBUST VESSEL DESIGN. Added 2026-08-21, ISSUES.md item 67.
+  #
+  # k_nuc and k_grow cannot be measured here and no published fit exists for
+  # protein-mediated gold reduction, so waiting for a number is not a plan.
+  # The alternative is to stop needing one: choose a vessel that clears the
+  # target at the SLOWEST corner of both bands. Then the true value cannot
+  # change the outcome and the constants leave the critical path.
+  #
+  # 10x concentration, a 25 % seed and a 72 h batch give 98.2 % at the worst
+  # corner, k_nuc = 5e-6 with k_grow = 0.02, and 100 % everywhere else.
+  # src/sensitivity.py::reduce_worst_case computes it; the tests pin it.
+  #
+  # Cheaper designs that also clear 95 % at the worst corner: 6x with a 50 %
+  # seed over 72 h, and 8x with a 25 % seed over 72 h. Nothing clears it in
+  # 24 h at any concentration tested, so the BATCH LENGTH is not optional.
+  # -------------------------------------------------------------------------
+  robust_design:
+    concentration_factor:
+      value: 30.0
+      unit: dimensionless
+      meaning: Fold concentration of the eluate before reduction
+      status: design_recommendation
+      note: >-
+        RAISED 2026-08-21 from 10 when the k_grow floor was anchored on a
+        purified Au(III) reductase and fell sixty-fold. Chosen so the vessel
+        clears 95 % at the slow corner of the bands, not because 30 is a
+        measured requirement. At the centred constant 4x is enough.
+      source: null
+    seed_frac:
+      value: 0.50
+      unit: dimensionless
+      meaning: Gold particles seeded in, as a fraction of the gold charged
+      status: design_recommendation
+      note: >-
+        Half of a previous batch, recycled. THE SEED IS NOT CONSUMED and it is
+        not a reagent to buy: it is product held back, and it returns to the
+        next batch. That is what makes a seed this large affordable.
+      source: null
+    Rech_0:
+      value: 50.0
+      unit: uM
+      meaning: Dithionite charged to the reduction vessel
+      status: design_recommendation
+      note: >-
+        IT IS NOT A NEW CHEMICAL. S35's own protocol is built on it: "The
+        reaction was activated by adding 100 uL sodium dithionite (46 uM)
+        dissolved in sodium hydrogen carbonate (100 uM)." The source reaction
+        does not run without it, so this design asks for MORE of a reagent the
+        protocol already requires, not for a new one. Read from the paper
+        itself 2026-08-21.
+        THE QUANTITY IS MILLIGRAMS. Na2S2O4 is 174.1 g/mol, so 50 uM in a
+        litre is 8.7 mg. S35's own 4.6 uM is 0.8 mg/L.
+        ADDED 2026-08-21, and it is the term that makes the rest work. At 30x
+        concentration the gold is 11 uM, and the 4.6 uM of dithionite in S35's
+        own recipe supplies only 14.9 uM of electrons in total. The vessel
+        then stops at 82 % because it runs out of electrons, not because it is
+        slow: 168 h and 336 h give the same answer. Raising dithionite to
+        50 uM takes the same vessel to 99.95 %.
+        IT IS THE CHEAPEST TERM IN THE DESIGN. Dithionite is a bought reagent
+        (ISSUES.md item 51), not something the process has to make.
+        MORE REDUCTASE IS NOT A SUBSTITUTE, AND IT MAKES THINGS WORSE. Tested
+        2026-08-21: holding dithionite at 4.6 uM and raising the protein
+        target from 0.2 to 4.0 g/L moves the worst corner from 0.80 DOWN to
+        0.75. The rate carries the fraction of enzyme that is reduced,
+        E_red/E_tot, so adding enzyme against a fixed donor pool dilutes the
+        reducing power per molecule. The electron donor is the only lever
+        here. ISSUES.md items 64 and 67.
+      source: null
+    t_reduce_h:
+      value: 96.0
+      unit: h
+      meaning: Batch length
+      status: design_recommendation
+      note: >-
+        NOT OPTIONAL. Nothing tested clears the worst corner in 24 h at any
+        concentration. Time is the cheapest of the levers after dithionite and
+        it is the one that covers the slow end. 120 h buys another half point.
+      source: null
+    worst_case_eta_reduce:
+      value: 0.980
+      unit: dimensionless
+      meaning: Conversion at the slowest corner of both constant bands
+      status: derived
+      derivation: >-
+        src/sensitivity.py::reduce_worst_case over k_nuc [5e-6, 8.6e-4] and
+        k_grow [3.2e-3, 2.1], at 30x the delivered 0.3666 uM, seed 0.50,
+        Rech_0 50 uM, 96 h. Worst corner is the low end of both.
+      source: null
+  concentration_factor:
+    value: null
+    unit: dimensionless
+    meaning: >-
+      Fold concentration of the lysate before it is mixed into the eluate.
+    status: unmeasured
+    note: >-
+      The mixing table in ISSUES.md item 48 shows why this matters: a lysate
+      only 1.05x above target needs a 20:1 volume ratio and dilutes the gold
+      21x, while 10x above target costs 11%. This is a design variable, and
+      it must be chosen jointly with the volume reduction of item 35.
+    source: null
+  X_0:
+    value: 0.02
+    unit: g dry weight/L
+    meaning: Inoculum density at the start of the culture
+    status: assumed
+    note: "A 1:100 inoculation from a saturated overnight. Sets only how long
+      the lag to induction is, not the plateau."
+    source: null
+  X_cap:
+    value: 2.0
+    unit: g dry weight/L
+    meaning: Carrying capacity of the culture, the logistic ceiling
+    status: design_choice
+    range: [2.0, 20.4]
+    note: >-
+      SOURCED 2026-08-20. This was status assumed with source null, carrying
+      "about OD600 5 in LB batch" and nothing behind it. The value is unchanged
+      and it is now the low end of a measured band, not a guess.
+      IT IS A CHOICE OF MEDIUM, which is why it is a design_choice and not a
+      measurement. The band is what shake flasks are published to reach:
+      LB          OD600 up to 7    2.8 g/L   Sezonov 2007
+      TB, ZYM     OD600 30         8.1 g/L   Ukkonen 2011
+      EnBase, E-flask OD600 38    10.3 g/L  Ukkonen 2011
+      EnBase, UY flask OD600 73-78 19.7-21.1 g/L  Ukkonen 2011
+      2.0 is OD600 5 in LB, below Sezonov's ceiling of 7, so the adopted value
+      is the conservative end of the conservative medium.
+      IT SCALES THE VOLUMETRIC YIELD LINEARLY, so it moves the shortfall of
+      ISSUES.md item 52 in direct proportion and with no unknown in it. On the
+      pET-24(+) copy number the shortfall against the 0.2 g/L target runs
+      18.5x in LB, 4.6x in TB, 3.6x in EnBase Erlenmeyer and 1.8x in an
+      EnBase Ultra Yield flask. Terrific Broth alone is worth 4x.
+      WHAT THE BAND DOES NOT CARRY. Ukkonen's cultures are E. coli RB791 with
+      pQE30, a T5 promoter, not BL21(DE3) with pET. The biomass transfers; the
+      expression system does not. And high biomass with high T7 expression is
+      where inclusion bodies appear, which is BLOCKING item 32 for TetH.
+      ISSUES.md item 67.
+    source: >-
+      Sezonov, Joseleau-Petit & D'Ari 2007, J Bacteriol 189(23):8746-8749,
+      doi:10.1128/jb.01368-07, for the LB ceiling of OD600 7; Ukkonen et al.
+      2011, Microb Cell Fact 10:107, doi:10.1186/1475-2859-10-107, for the
+      measured shake-flask dry cell weights of 8.1, 10.3 and 19.7-21.1 g/L
+  g_dw_per_OD600:
+    value: 0.4
+    unit: g dry weight/L per OD600 unit
+    range: [0.30, 0.50]
+    meaning: Converts the optical density S35 quotes into biomass
+    status: sourced_from_an_inconsistent_literature
+    note: >-
+      SOURCED 2026-08-21. Was status assumed with source null. The value is
+      unchanged.
+      THE LITERATURE SPREADS. BioNumbers carries several entries for this
+      ratio: about 0.36 g/L per OD600 is the most commonly cited default,
+      0.3 to 0.5 is the usual quoted range, and a rule of thumb of 0.5 also
+      appears. It is strain and spectrophotometer dependent, and every source
+      that gives it says to calibrate your own curve.
+      IT ONLY SETS X_ind, the biomass at induction, from S35's OD600 0.8-1.0.
+      It does not touch the plateau, so the band is carried for honesty rather
+      than because it moves the answer.
+    source: >-
+      BioNumbers E. coli cell-dry-weight per OD600 entries, about 0.36 g/L
+      commonly cited, 0.3 to 0.5 usual range, strain and instrument dependent
+  OD_induce:
+    value: 0.9
+    unit: OD600
+    meaning: Optical density at which IPTG is added
+    status: from_source_recipe
+    note: >-
+      S35 induces with 1 mM IPTG at OD600 0.8-1.0 and harvests 4 h later,
+      sampling every 2 h. X_ind = OD_induce * g_dw_per_OD600 = 0.36 g/L.
+    source: S35
+  burden:
+    value: 0.3
+    unit: dimensionless
+    range: [0.10, 0.45]
+    meaning: >-
+      Fractional slowing of growth after induction, from the metabolic cost of
+      expressing the construct. mu_eff = mu*(1 - burden) once induced.
+    status: sourced_from_the_burden_literature
+    note: >-
+      SOURCED 2026-08-21, replacing a null that the tests had been passing as
+      0.3 by hand since 2026-08-16. The hand-passed value was right; it simply
+      had nothing behind it.
+      A 33 % fall in maximum specific growth rate is reported under
+      IPTG-induced recombinant expression, and a survey of hundreds of
+      BioBricks found none reducing growth by more than 45 %. 0.30 is the
+      induced-expression figure; 0.45 is the observed worst case and 0.10 a
+      light-burden case, so the band is 0.10 to 0.45.
+      IT SETS THE PLATEAU ONLY THROUGH mu_eff. A heavier burden slows growth
+      after induction, which lowers biomass and raises protein per cell at the
+      same time; the two partly cancel.
+      IT DOES CHANGE THE HARVEST TIME, unlike the cascade constants: 95 % of
+      plateau arrives 3.9 h after induction at burden 0 and 12.7 h at burden
+      0.7. The band was 0.0 to 0.7 while the value was null; it narrows to
+      0.10 to 0.45 now that the literature is behind it.
+      ONE GROWTH CURVE WITH AND WITHOUT IPTG REPLACES IT, and it is still the
+      cheapest measurement in this arm. ISSUES.md items 52 and 67.
+    source: >-
+      33 % growth-rate fall under IPTG-induced expression (metabolic-burden
+      maintenance-coefficient literature); <45 % across hundreds of BioBricks,
+      Nature Communications 2024 burden survey
+  t_harvest_source_h:
+    value: 4.0
+    unit: h after induction
+    meaning: When S35 harvests
+    status: from_source_recipe
+    note: >-
+      Reproduced by src/reductase.py at about 84% of the plateau yield, so
+      S35's schedule is close to but short of the volumetric optimum. Waiting
+      to about 8 h after induction reaches 97%. ISSUES.md item 52.
+    source: S35
+
 recovery:
+  # OUT OF SCOPE. Decided 2026-08-16, CONFIRMED PERMANENT 2026-08-21.
+  #
+  # There is no physical-recovery model in this repository and there will not
+  # be one. Whatever gold reaches metal is taken to be the gold we have. The
+  # chain ends at reduction.
+  #
+  # eta_total therefore answers "how much gold reaches metal" and NOT "how
+  # much gold reaches the crucible". Those are different questions and this
+  # repository answers only the first. Anyone comparing eta_total against a
+  # figure that includes centrifugation, washing and ashing is comparing two
+  # different quantities.
+  #
+  # The three terms below are kept, null and out of scope, because the record
+  # is not deleted (AGENTS.md rule 6). They are not parameters of this model.
+  # Nothing reads them. Restoring the stage means writing a particle-size
+  # model first, because that is what eta_spin actually depends on.
+  eta_phys:
+    value: 1.0
+    unit: dimensionless
+    meaning: >-
+      Fraction of reduced gold that is collected. Fixed at 1 by scope: all
+      reduced gold is taken to be the product.
+    status: out_of_scope
+    note: >-
+      Team decision 2026-08-16, confirmed permanent 2026-08-21. This is not an
+      estimate of a recovery efficiency. It is the statement that the model
+      stops at reduction.
+      IT IS NOT A FREE PARAMETER. Do not sweep it, do not band it, and do not
+      put it in an error bar. A scope boundary has no uncertainty.
+    source: null
+    superseded:
+      value: "eta_spin * eta_wash * eta_ash"
+      range: "0.465 at 10 nm to 0.903 above 200 nm"
+      reason: >-
+        Carried until 2026-08-16 and retired for scope. It was never a
+        measurement: particle size was never modelled, eta_spin is
+        size-dependent and sourced at one point only, and eta_wash was an
+        unsourced upper bound. The stage carried a 2x uncertainty driven
+        entirely by a quantity nobody had measured.
   eta_spin:
     value: null
-    range: [0.45, 0.99]
-    status: "sourced only at 10 nm (~0.50)"
+    unit: dimensionless
+    meaning: Fraction of metal particles pelleted by centrifugation
+    status: out_of_scope
+    note: >-
+      OUT OF SCOPE 2026-08-21. A source was added earlier the same day and has
+      been removed with it: sourcing a parameter the model does not use is
+      work spent on nothing. Recorded here only so the reason survives.
+      IT DEPENDS ON PARTICLE SIZE, which this repository does not model. The
+      Finke-Watzky reduction model tracks how much gold becomes metal, not how
+      big the particles get. Any eta_spin would be an answer about a quantity
+      with no equation behind it.
+    superseded:
+      value: 0.50
+      range: [0.45, 0.99]
+      reason: >-
+        Sourced at 10 nm only. Sedimentation goes as the square of diameter,
+        so the value is meaningless without a size distribution.
+    source: null
   eta_wash:
-    value: 0.95
-    status: "unsourced --- upper bound"
-    flag: warning
+    value: null
+    unit: dimensionless
+    meaning: Fraction surviving the wash step
+    status: out_of_scope
+    note: "OUT OF SCOPE 2026-08-21, with the rest of physical recovery."
+    superseded:
+      value: 0.95
+      reason: "Unsourced, and an upper bound in its own right."
+    source: null
   eta_ash:
-    value: 0.98
-    status: "conditional on 500-600 C"
+    value: null
+    unit: dimensionless
+    meaning: Fraction surviving ashing at 500-600 C
+    status: out_of_scope
+    note: "OUT OF SCOPE 2026-08-21, with the rest of physical recovery."
+    superseded:
+      value: 0.98
+      reason: "Conditional on 500-600 C, and never checked."
+    source: null
 
 # Reported results from model.md, for regression testing.
 reported:

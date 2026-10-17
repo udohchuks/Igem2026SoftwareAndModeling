@@ -1,0 +1,28 @@
+meta:
+  purpose: Reproducible technical recovery report figure scenarios, not measured uncertainty.
+figures:
+  grid_points:
+    value: 40
+    unit: count per kinetic axis
+    status: numerical_setting
+    source: ISSUES 90; full declared kinetic ranges sampled geometrically
+  dose_points:
+    value: 41
+    unit: count
+    status: numerical_setting
+    source: ISSUES 90; structural protein-dose comparison
+  minimum_dose_ratio:
+    value: 0.01
+    unit: dimensionless
+    status: scenario_choice
+    source: ISSUES 90; one hundredth of reference dose, not a measured bound
+  maximum_dose_ratio:
+    value: 10.0
+    unit: dimensionless
+    status: scenario_choice
+    source: ISSUES 90; ten times reference dose, not a measured bound
+  elution_duration_multiplier:
+    value: 4.0
+    unit: dimensionless
+    status: scenario_choice
+    source: ISSUES 90; display four reference wash durations

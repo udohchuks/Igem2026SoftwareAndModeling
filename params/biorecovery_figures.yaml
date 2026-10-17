@@ -1,0 +1,51 @@
+meta:
+  purpose: >-
+    Reproducible biorecovery wiki figure scenarios, 2026-09-19. Every entry is a
+    display or scenario choice for docs/make_biorecovery_figures.py. None of them
+    is a measurement, and none of them is a model parameter.
+scenario:
+  downstream_wetted_area_m2:
+    value: 23.6
+    unit: m^2
+    status: production_scale_downstream_design_input
+    source: >-
+      Surface area selected for the downstream production-design calculation.
+      It is not the current hardware: twelve 7 cm by 3 cm combs provide
+      0.0504 m^2 when both broad faces are counted.
+  copper_stress_uM:
+    value: 818.0
+    unit: uM
+    status: upper_bound_stress_test_not_expected_feed
+    source: >-
+      Part I peak Cu(II) inventory reinterpreted as though it could all compete
+      reversibly; tests/test_leach.py. ISSUES.md item 92.
+  capture_duration_h:
+    value: 1.0
+    unit: h
+    status: display_window
+    source: >-
+      Long enough for the reference contact to reach its plateau; the capture
+      contact time remains a design input, not a fixed parameter.
+  elution_duration_h:
+    value: 12.0
+    unit: h
+    status: display_window
+    source: S60; the release duration reported by the acid-thiourea study
+display:
+  grid_points:
+    value: 400
+    unit: count
+    status: numerical_setting
+    source: Smooth curves on every biorecovery figure axis
+  area_maximum_m2:
+    value: 100.0
+    unit: m^2
+    status: illustrative_sweep
+    source: >-
+      About four times the reference wetted area, chosen to show where the
+      dissolved-gold inventory becomes limiting. Not an achievable hardware claim.
+  figure_dpi:
+    value: 180
+    unit: dots per inch
+    status: display_setting
+    source: Matches docs/make_recovery_figures.py

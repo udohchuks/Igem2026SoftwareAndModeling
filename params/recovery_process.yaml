@@ -1,0 +1,23 @@
+meta:
+  purpose: Explicit recovery volume ledger; illustrative assumptions, not measured operating volumes.
+volumes:
+  feed_volume_L:
+    value: 1.0
+    unit: L
+    status: illustrative_volume_assumption
+    source: ISSUES 90; reference amount basis
+  capture_volume_L:
+    value: 1.0
+    unit: L
+    status: illustrative_volume_assumption
+    source: ISSUES 90; equal-volume reference
+  elution_volume_L:
+    value: 1.0
+    unit: L
+    status: illustrative_volume_assumption
+    source: ISSUES 90; equal-volume reference
+  lysate_volume_L:
+    value: 0.0
+    unit: L
+    status: illustrative_volume_assumption
+    source: ISSUES 90; reference protein supplied with negligible added volume

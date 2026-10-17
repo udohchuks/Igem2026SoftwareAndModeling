@@ -359,15 +359,14 @@ coefficient $\lambda_D$ remains null, requiring µM⁻¹ h⁻¹ when damage is �
 ## Elution
 
 Initial bound gold is $C_0$, residual fraction is $\phi$, and remaining elutable
-gold is $U$. The empirical second-order constant is $k_2$ in µM⁻¹ h⁻¹.
+gold is $U$. The first-order release constant is $k_{elute}$ in h⁻¹.
 
-$$\dot U=-k_2U^2,\quad U(0)=(1-\phi)C_0,\quad
-k_{elute}=k_2(1-\phi)C_0.$$
+$$\dot U=-k_{elute}U,\qquad U(0)=(1-\phi)C_0.$$
 
-$$\eta_{elute}=(1-\phi)\frac{k_{elute}t}{1+k_{elute}t}.$$
+$$\eta_{elute}=(1-\phi)(1-e^{-k_{elute}t}).$$
 
-The empirical first-order comparison is
-$\eta_{elute,PFO}=(1-\phi)(1-e^{-k_{elute}t})$.
+The retired pseudo-second-order comparison is
+$\eta_{elute,PSO}=(1-\phi)k_{elute}t/(1+k_{elute}t)$.
 Constants in the two laws need separate fits; neither establishes a mechanism.
 
 ## Reduction
