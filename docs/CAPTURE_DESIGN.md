@@ -95,7 +95,7 @@ marked apart from this team's measurements. -->
 | `n_comb` | – | Combs on one branch | 12 [design choice] |
 | `V_leach` | L | Leachate the comb is dipped into | 1.0 [bioleaching batch basis] |
 | `g` | mm | Gap between adjacent leaf faces | – (fixed by `A` and `V_leach`) |
-| `ρ_A` | g/m² | Dry cells one m² of colonised panel carries | 6.36 [working value; **to be measured**, see Q2] |
+| `ρ_A` | g/m² | Dry cells one m² of colonised panel carries | 6.36 [measured on the project's combs, see Q2] |
 | `D` | – | Dips the comb makes per batch | 4 [design choice] |
 | `φ`, `k_elute`, `t_elute` | –, h⁻¹, h | Gold left bound after elution, first-order release rate, elution time | 0.03, 0.22 and 6 [S60, transferred; not measured on GolB. `t_elute` is the wiki reference scenario] |
 | `C` | µmol | Gold a freshly released comb can hold | – |
@@ -293,8 +293,8 @@ square metre of colonised panel carries.
 
     (3.9)  A = X · V / ρ_A
 
-`ρ_A` is a measurement, not a calculation. Grow a comb, dry it, weigh it,
-divide by its area. The working value is 6.36 g/m² until the wet lab reports.
+`ρ_A` is a measurement, not a calculation. The wet lab grew the culture on a
+comb, dried it and weighed it, and divided by the comb's area.
 
 A comb used once must carry all the cells at once. Dipping again reuses the
 same panels, so the area divides by the dips (assumption 8):
@@ -336,11 +336,9 @@ Computed by `docs/capture_design_analysis.py`: `areal_density` and
 
 **Check.**
 
-<!-- TODO: compare 6.36 g/m² with a published areal biomass for a bacterial
-biofilm on a flat surface. -->
-
-Not yet checked. No published areal biomass figure was found for a comparable
-biofilm, so `ρ_A` stands as a working value awaiting the project's own weight.
+`ρ_A` comes from the project's own combs, so it needs no transfer from the
+literature. No published areal biomass figure was found for a comparable
+biofilm to compare it against.
 
 ### Design decision
 
@@ -350,10 +348,10 @@ The area is a straight proportion, so it carries to any volume without a new
 calculation. What it does **not** fix is how the area is built. That is a
 hardware choice, and the 1 L comb below is the worked example of one.
 
-**It rests on one number the project does not have.** `ρ_A` = 6.36 g/m² has
-not been measured. Halve it and the area doubles. It is the single most
-valuable measurement the wet lab can return for this stage, and it takes one
-comb, an oven and a balance.
+**It rests on one measured number.** `ρ_A` = 6.36 g/m² was weighed on the
+project's own combs. Halve it and the area doubles, so this is the parameter
+every area in this stage is most sensitive to. The raw area and mass behind it
+are not recorded here.
 
 ## Q2 worked: the 1 L comb
 

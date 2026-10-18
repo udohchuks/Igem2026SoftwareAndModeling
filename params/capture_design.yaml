@@ -147,12 +147,13 @@ stage3_design:
   areal_density_g_m2:
     value: 6.36
     unit: g dry cells per m^2 of panel
-    status: assumption_to_be_measured
+    status: measured_by_the_wet_lab
     source: >-
       How many dry grams of cells one square metre of colonised panel carries.
-      One number, measured in one step: grow a comb, dry it, weigh it, divide
-      by its area. Until the wet lab reports, 6.36 is a working value. Every
-      area and every dip count in Q2 and Q3 scales inversely with it.
+      Measured on the project's own combs: the wet lab grew the culture on a
+      comb, dried it and weighed it. Author's report, 2026-10-17; the raw area
+      and mass were not recorded in this repository. Every area and every
+      loading count in Q2 and Q3 scales inversely with it.
       Superseded the 30-layers-times-monolayer calculation on 2026-10-17.
   film_thickness_m:
     value: 3.0e-5
